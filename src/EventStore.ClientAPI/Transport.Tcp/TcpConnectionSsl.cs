@@ -189,6 +189,7 @@ namespace EventStore.ClientAPI.Transport.Tcp {
 			try {
 				sb.AppendFormat("Hash strength: {0}\n", stream.HashStrength);
 			} catch (NotImplementedException) {
+			} catch (ArgumentOutOfRangeException) {
 			}
 
 			sb.AppendFormat("Key exchange: {0}\n", stream.KeyExchangeAlgorithm);
