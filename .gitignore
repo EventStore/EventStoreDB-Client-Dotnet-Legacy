@@ -362,3 +362,5 @@ MigrationBackup/
 certs/
 .DS_Store
 docs/public
+
+test-results/
