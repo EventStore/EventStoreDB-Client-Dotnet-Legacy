@@ -13,11 +13,11 @@ namespace EventStore.ClientAPI {
 		}
 
 		[Theory, ClassData(typeof(StreamIdFilterCases))]
-		public async Task stream_id_concurrently(bool useSsl, Func<string, Filter> getFilter, string name) {
-			var streamName = $"{GetStreamName()}_{useSsl}_{name}";
+		public async Task stream_id_concurrently(Func<string, Filter> getFilter, string name) {
+			var streamName = $"{GetStreamName()}_{name}";
 			var eventAppearedSource1 = new TaskCompletionSource<ResolvedEvent>();
 			var eventAppearedSource2 = new TaskCompletionSource<ResolvedEvent>();
-			var connection = _fixture.Connections[useSsl];
+			var connection = _fixture.Connection;
 			var filter = getFilter(streamName);
 
 			using (await connection
@@ -57,11 +57,11 @@ namespace EventStore.ClientAPI {
 
 		[Theory, ClassData(typeof(EventTypeFilterCases))]
 		public async Task event_type_concurrently(EventTypeFilterCases.Case testCase) {
-			var eventTypePrefix = $"{GetStreamName()}_{testCase.UseSsl}_{testCase.FilterType}";
+			var eventTypePrefix = $"{GetStreamName()}_{testCase.FilterType}";
 
 			var eventAppearedSource1 = new TaskCompletionSource<ResolvedEvent>();
 			var eventAppearedSource2 = new TaskCompletionSource<ResolvedEvent>();
-			var connection = _fixture.Connections[testCase.UseSsl];
+			var connection = _fixture.Connection;
 			var filter = testCase.CreateFilter(eventTypePrefix);
 
 			using (await connection
@@ -102,12 +102,12 @@ namespace EventStore.ClientAPI {
 				eventAppearedSource2.TrySetException(ex ?? new ObjectDisposedException(nameof(s)));
 		}
 
-		[Theory(Skip = nameof(drops_on_subscriber_error) + " is bugged"), MemberData(nameof(UseSslTestCases))]
-		public async Task drops_on_subscriber_error(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
+		[Fact(Skip = nameof(drops_on_subscriber_error) + " is bugged")]
+		public async Task drops_on_subscriber_error() {
+			var streamName = GetStreamName();
 			var droppedSource = new TaskCompletionSource<(SubscriptionDropReason, Exception)>();
 			var expectedException = new Exception("subscriber error");
-			var connection = _fixture.Connections[useSsl];
+			var connection = _fixture.Connection;
 
 			using var _ = await connection
 				.FilteredSubscribeToAllAsync(false, Filter.ExcludeSystemEvents, EventAppeared,
@@ -128,10 +128,10 @@ namespace EventStore.ClientAPI {
 				droppedSource.TrySetResult((reason, ex));
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task drops_on_unsubscribed(bool useSsl) {
+		[Fact]
+		public async Task drops_on_unsubscribed() {
 			var droppedSource = new TaskCompletionSource<(SubscriptionDropReason, Exception)>();
-			var connection = _fixture.Connections[useSsl];
+			var connection = _fixture.Connection;
 
 			using var subscription = await connection
 				.FilteredSubscribeToAllAsync(false, Filter.ExcludeSystemEvents, EventAppeared,
@@ -152,7 +152,7 @@ namespace EventStore.ClientAPI {
 		}
 
 		public async Task InitializeAsync() {
-			var connection = _fixture.Connections[true];
+			var connection = _fixture.Connection;
 			;
 
 			await connection.SetStreamMetadataAsync("$all", ExpectedVersion.Any,
@@ -160,7 +160,7 @@ namespace EventStore.ClientAPI {
 		}
 
 		public async Task DisposeAsync() {
-			var connection = _fixture.Connections[true];
+			var connection = _fixture.Connection;
 			;
 
 			await connection.SetStreamMetadataAsync("$all", ExpectedVersion.Any,

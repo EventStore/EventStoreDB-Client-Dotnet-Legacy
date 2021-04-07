@@ -34,19 +34,18 @@ namespace EventStore.ClientAPI {
 			var metadatas = new[] {builder, null};
 
 			foreach (var (expectedVersion, displayName) in ExpectedVersions)
-			foreach (var useSsl in UseSsl)
 			foreach (var createStream in createStreams)
 			foreach (var metadata in metadatas) {
-				yield return new object[] {expectedVersion, displayName, useSsl, createStream, metadata};
+				yield return new object[] {expectedVersion, displayName, createStream, metadata};
 			}
 		}
 
 		[Theory, MemberData(nameof(MetadataTestCases))]
-		public async Task returns_expected_result(long expectedVersion, string displayName, bool useSsl,
+		public async Task returns_expected_result(long expectedVersion, string displayName,
 			bool createStream, StreamMetadataBuilder builder) {
 			var isEmpty = builder == null;
-			var streamName = $"{GetStreamName()}_{displayName}_{useSsl}_{createStream}_{isEmpty}";
-			var connection = _fixture.Connections[useSsl];
+			var streamName = $"{GetStreamName()}_{displayName}_{createStream}_{isEmpty}";
+			var connection = _fixture.Connection;
 			if (createStream) {
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.NoStream, _fixture.CreateTestEvents())
 					.WithTimeout();

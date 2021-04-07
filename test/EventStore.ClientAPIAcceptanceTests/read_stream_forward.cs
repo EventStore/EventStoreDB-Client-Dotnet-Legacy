@@ -10,10 +10,10 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task when_the_stream_exists(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task when_the_stream_exists() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 
 			var testEvents = _fixture.CreateTestEvents(3).ToArray();
 
@@ -28,10 +28,10 @@ namespace EventStore.ClientAPI {
 			Assert.Equal(testEvents.Select(x => x.EventId), result.Events.Select(x => x.OriginalEvent.EventId));
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task when_the_stream_does_not_exist(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task when_the_stream_does_not_exist() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 
 			var result = await connection.ReadStreamEventsForwardAsync(streamName, 0, 5, false)
 				.WithTimeout();
@@ -41,10 +41,10 @@ namespace EventStore.ClientAPI {
 			Assert.Equal(ReadDirection.Forward, result.ReadDirection);
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task when_the_stream_is_deleted(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task when_the_stream_is_deleted() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 
 			await connection.AppendToStreamAsync(streamName, ExpectedVersion.NoStream, _fixture.CreateTestEvents(3))
 				.WithTimeout();

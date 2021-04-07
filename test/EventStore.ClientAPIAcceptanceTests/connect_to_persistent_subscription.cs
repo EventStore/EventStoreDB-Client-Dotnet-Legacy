@@ -13,10 +13,10 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task that_does_not_exist_throws(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task that_does_not_exist_throws() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 
 			var ex = await Record.ExceptionAsync(() => connection.ConnectToPersistentSubscriptionAsync(
 				streamName, Group,

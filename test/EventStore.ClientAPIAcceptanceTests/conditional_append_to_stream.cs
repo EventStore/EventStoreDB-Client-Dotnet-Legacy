@@ -9,10 +9,10 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task returns_version_mismatch_with_wrong_expected_version(bool useSsl) {
-			var stream = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task returns_version_mismatch_with_wrong_expected_version() {
+			var stream = GetStreamName();
+			var connection = _fixture.Connection;
 
 			var result = await connection.ConditionalAppendToStreamAsync(stream, 7, _fixture.CreateTestEvents())
 				.WithTimeout();
@@ -20,20 +20,19 @@ namespace EventStore.ClientAPI {
 		}
 
 		[Theory, MemberData(nameof(ExpectedVersionTestCases))]
-		public async Task returns_succeeded_with_correct_expected_version(long expectedVersion, string displayName,
-			bool useSsl) {
-			var stream = $"{GetStreamName()}_{displayName}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		public async Task returns_succeeded_with_correct_expected_version(long expectedVersion, string displayName) {
+			var stream = $"{GetStreamName()}_{displayName}";
+			var connection = _fixture.Connection;
 
 			var result = await connection
 				.ConditionalAppendToStreamAsync(stream, expectedVersion, _fixture.CreateTestEvents()).WithTimeout();
 			Assert.Equal(ConditionalWriteStatus.Succeeded, result.Status);
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task returns_succeeded_when_stream_deleted(bool useSsl) {
-			var stream = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task returns_succeeded_when_stream_deleted() {
+			var stream = GetStreamName();
+			var connection = _fixture.Connection;
 
 			await connection.AppendToStreamAsync(stream, ExpectedVersion.Any, _fixture.CreateTestEvents())
 				.WithTimeout();

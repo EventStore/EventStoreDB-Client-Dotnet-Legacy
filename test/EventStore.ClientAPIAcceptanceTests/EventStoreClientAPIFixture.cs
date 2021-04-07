@@ -17,7 +17,7 @@ namespace EventStore.ClientAPI {
 
 		private readonly IContainerService _eventStore;
 
-		public IDictionary<bool, IEventStoreConnection> Connections { get; }
+		public IEventStoreConnection Connection { get; }
 
 		public EventStoreClientAPIFixture() {
 			ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
@@ -35,9 +35,7 @@ namespace EventStore.ClientAPI {
 				.ExposePort(2113, 2113)
 				.MountVolume(HostCertificatePath, "/etc/eventstore/certs", MountType.ReadOnly)
 				.Build();
-			Connections = new Dictionary<bool, IEventStoreConnection> {
-				[true] = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113)
-			};
+			Connection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113);
 		}
 
 		public async Task InitializeAsync() {
@@ -65,11 +63,11 @@ namespace EventStore.ClientAPI {
 				_eventStore.Dispose();
 				throw;
 			}
-			await Connections[true].ConnectAsync();
+			await Connection.ConnectAsync();
 		}
 
 		public Task DisposeAsync() {
-			Connections[true].Dispose();
+			Connection.Dispose();
 			_eventStore.Dispose();
 			return Task.CompletedTask;
 		}

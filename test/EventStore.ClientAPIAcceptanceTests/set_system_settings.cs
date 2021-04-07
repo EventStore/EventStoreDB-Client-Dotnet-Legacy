@@ -12,9 +12,9 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task writes_to_the_correct_stream(bool useSsl) {
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task writes_to_the_correct_stream() {
+			var connection = _fixture.Connection;
 			var expected = new SystemSettings(
 				new StreamAcl(
 					Guid.NewGuid().ToString(),
@@ -39,9 +39,9 @@ namespace EventStore.ClientAPI {
 			Assert.Equal(expected.ToJsonBytes(), result.Events[0].OriginalEvent.Data);
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task without_permission_throws(bool useSsl) {
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task without_permission_throws() {
+			var connection = _fixture.Connection;
 			await Assert.ThrowsAsync<AccessDeniedException>(() => connection.SetSystemSettingsAsync(new SystemSettings(
 				new StreamAcl(
 					Guid.NewGuid().ToString(),
@@ -60,7 +60,7 @@ namespace EventStore.ClientAPI {
 		public Task InitializeAsync() => Task.CompletedTask;
 
 		public async Task DisposeAsync() {
-			var connection = _fixture.Connections[true];;
+			var connection = _fixture.Connection;;
 
 			await connection.SetSystemSettingsAsync(new SystemSettings(null, null), DefaultUserCredentials.Admin)
 				.WithTimeout();

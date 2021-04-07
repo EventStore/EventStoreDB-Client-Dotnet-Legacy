@@ -12,10 +12,10 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task without_credentials_fails(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task without_credentials_fails() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 
 			await connection.CreatePersistentSubscriptionAsync(streamName, Group,
 				PersistentSubscriptionSettings.Create(), DefaultUserCredentials.Admin).WithTimeout();
@@ -24,20 +24,20 @@ namespace EventStore.ClientAPI {
 				() => connection.DeletePersistentSubscriptionAsync(streamName, Group).WithTimeout());
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task that_does_not_exist_fails(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task that_does_not_exist_fails() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 
 			await Assert.ThrowsAsync<InvalidOperationException>(
 				() => connection.DeletePersistentSubscriptionAsync(streamName, Group, DefaultUserCredentials.Admin)
 					.WithTimeout());
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task with_credentials_succeeds(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task with_credentials_succeeds() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 
 			await connection.CreatePersistentSubscriptionAsync(streamName, Group,
 				PersistentSubscriptionSettings.Create(), DefaultUserCredentials.Admin).WithTimeout();

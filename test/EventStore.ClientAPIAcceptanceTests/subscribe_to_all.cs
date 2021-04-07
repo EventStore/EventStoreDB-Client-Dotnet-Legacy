@@ -12,12 +12,12 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task concurrently(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
+		[Fact]
+		public async Task concurrently() {
+			var streamName = GetStreamName();
 			var eventAppearedSource1 = new TaskCompletionSource<ResolvedEvent>();
 			var eventAppearedSource2 = new TaskCompletionSource<ResolvedEvent>();
-			var connection = _fixture.Connections[useSsl];
+			var connection = _fixture.Connection;
 
 			using (await connection.SubscribeToAllAsync(false, EventAppeared1, SubscriptionDropped1).WithTimeout())
 			using (await connection.SubscribeToAllAsync(false, EventAppeared2, SubscriptionDropped2).WithTimeout()) {
@@ -54,12 +54,12 @@ namespace EventStore.ClientAPI {
 				eventAppearedSource2.TrySetException(ex ?? new ObjectDisposedException(nameof(s)));
 		}
 
-		[Theory(Skip = nameof(drops_on_subscriber_error) + " is bugged"), MemberData(nameof(UseSslTestCases))]
-		public async Task drops_on_subscriber_error(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
+		[Fact(Skip = nameof(drops_on_subscriber_error) + " is bugged")]
+		public async Task drops_on_subscriber_error() {
+			var streamName = GetStreamName();
 			var droppedSource = new TaskCompletionSource<(SubscriptionDropReason, Exception)>();
 			var expectedException = new Exception("subscriber error");
-			var connection = _fixture.Connections[useSsl];
+			var connection = _fixture.Connection;
 
 			using var _ = await connection
 				.SubscribeToAllAsync(false, EventAppeared, SubscriptionDropped).WithTimeout();
@@ -79,10 +79,10 @@ namespace EventStore.ClientAPI {
 				droppedSource.TrySetResult((reason, ex));
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task drops_on_unsubscribed(bool useSsl) {
+		[Fact]
+		public async Task drops_on_unsubscribed() {
 			var droppedSource = new TaskCompletionSource<(SubscriptionDropReason, Exception)>();
-			var connection = _fixture.Connections[useSsl];
+			var connection = _fixture.Connection;
 
 			using var subscription = await connection
 				.SubscribeToAllAsync(false, EventAppeared, SubscriptionDropped).WithTimeout();
@@ -102,14 +102,14 @@ namespace EventStore.ClientAPI {
 		}
 
 		public async Task InitializeAsync() {
-			var connection = _fixture.Connections[true];;
+			var connection = _fixture.Connection;;
 
 			await connection.SetStreamMetadataAsync("$all", ExpectedVersion.Any,
 				StreamMetadata.Build().SetReadRole(SystemRoles.All), DefaultUserCredentials.Admin).WithTimeout();
 		}
 
 		public async Task DisposeAsync() {
-			var connection = _fixture.Connections[true];;
+			var connection = _fixture.Connection;;
 
 			await connection.SetStreamMetadataAsync("$all", ExpectedVersion.Any,
 				StreamMetadata.Build().SetReadRole(null), DefaultUserCredentials.Admin).WithTimeout();

@@ -6,12 +6,8 @@ using System.Text.RegularExpressions;
 namespace EventStore.ClientAPI {
 	public class StreamIdFilterCases : IEnumerable<object[]> {
 		public IEnumerator<object[]> GetEnumerator() {
-			var useSslCases = new[] {true};
-
-			foreach (var useSsl in useSslCases) {
-				yield return new object[] {useSsl, StreamIdPrefix, nameof(StreamIdPrefix)};
-				yield return new object[] {useSsl, StreamIdRegex, nameof(StreamIdRegex)};
-			}
+			yield return new object[] {StreamIdPrefix, nameof(StreamIdPrefix)};
+			yield return new object[] {StreamIdRegex, nameof(StreamIdRegex)};
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -22,20 +18,18 @@ namespace EventStore.ClientAPI {
 			Filter.StreamId.Regex(new Regex($"^{prefix}"));
 
 		public enum FilterType {
-			Prefix, 
+			Prefix,
 			Regex
 		}
+
 		public class StreamIdFilterCase {
-			public StreamIdFilterCase(bool useSsl, FilterType filterType) {
-				UseSsl = useSsl;
+			public StreamIdFilterCase(FilterType filterType) {
 				FilterType = filterType;
 			}
 
-			public bool UseSsl { get; }
 			public FilterType FilterType { get; }
 
-			public Filter CreateFilter(string prefix) => FilterType switch
-			{
+			public Filter CreateFilter(string prefix) => FilterType switch {
 				FilterType.Prefix => StreamIdPrefix(prefix),
 				FilterType.Regex => StreamIdRegex(prefix),
 				_ => throw new NotImplementedException(),

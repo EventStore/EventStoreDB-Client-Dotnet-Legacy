@@ -16,13 +16,13 @@ namespace EventStore.ClientAPI {
 					: new IPEndPoint(IPAddress.Loopback, port ?? 1113));
 		}
 
-		public static IEventStoreConnection CreateConnectionWithConnectionString(bool useSsl,
-			string configureSettings = default, int? port = default, bool useDnsEndPoint = false) {
+		public static IEventStoreConnection CreateConnectionWithConnectionString(string configureSettings = default,
+			int? port = default, bool useDnsEndPoint = false) {
 			var settings = configureSettings ?? DefaultConfigureSettingsForConnectionString;
 			var host = useDnsEndPoint ? "localhost" : IPAddress.Loopback.ToString();
 			port ??= 1113;
 
-			settings += useSsl ? "UseSslConnection=true;ValidateServer=false;" : "UseSslConnection=false;";
+			settings += "UseSslConnection=true;ValidateServer=false;";
 
 			return EventStoreConnection.Create($"ConnectTo=tcp://{host}:{port};{settings}");
 		}

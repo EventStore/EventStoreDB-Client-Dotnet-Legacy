@@ -6,12 +6,8 @@ using System.Text.RegularExpressions;
 namespace EventStore.ClientAPI {
 	public class EventTypeFilterCases : IEnumerable<object[]> {
 		public IEnumerator<object[]> GetEnumerator() {
-			var useSslCases = new[] { true };
-
-			foreach (var useSsl in useSslCases) {
-				yield return new object[] { new Case(useSsl, FilterType.Prefix) };
-				yield return new object[] { new Case(useSsl, FilterType.Regex) };
-			}
+			yield return new object[] {new Case(FilterType.Prefix)};
+			yield return new object[] {new Case(FilterType.Regex)};
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -27,15 +23,13 @@ namespace EventStore.ClientAPI {
 		}
 
 		public class Case {
-			public Case(bool useSsl, FilterType filterType) {
-				UseSsl = useSsl;
+			public Case(FilterType filterType) {
 				FilterType = filterType;
 			}
 
-			public bool UseSsl { get; }
 			public FilterType FilterType { get; }
-			public Filter CreateFilter(string filter) => FilterType switch
-			{
+
+			public Filter CreateFilter(string filter) => FilterType switch {
 				FilterType.Prefix => EventTypePrefix(filter),
 				FilterType.Regex => EventTypeRegex(filter),
 				_ => throw new NotImplementedException()

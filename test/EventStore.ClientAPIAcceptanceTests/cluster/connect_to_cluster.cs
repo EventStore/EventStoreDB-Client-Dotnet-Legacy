@@ -21,7 +21,7 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task can_connect_to_tls_ip_endpoint_gossip_seed() {
-			var streamName = $"{GetStreamName()}";
+			var streamName = GetStreamName();
 			using var connection = _fixture.CreateConnectionWithGossipSeeds(
 				builder => builder.UseSsl(true));
 			await connection.ConnectAsync().WithTimeout();
@@ -32,7 +32,7 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task can_connect_to_tls_dns_endpoint_gossip_seed() {
-			var streamName = $"{GetStreamName()}";
+			var streamName = GetStreamName();
 			using var connection = _fixture.CreateConnectionWithGossipSeeds(
 				builder => builder.UseSsl(true),true);
 			await connection.ConnectAsync().WithTimeout();
@@ -44,7 +44,7 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task can_connect_to_tls_ip_endpoint_gossip_seed_with_connection_string() {
-			var streamName = $"{GetStreamName()}";
+			var streamName = GetStreamName();
 			using var connection = _fixture.CreateConnectionWithConnectionString(true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
@@ -54,7 +54,7 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task can_connect_to_tls_dns_endpoint_gossip_seed_with_connection_string() {
-			var streamName = $"{GetStreamName()}";
+			var streamName = GetStreamName();
 			using var connection = _fixture.CreateConnectionWithConnectionString(true, null, true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =

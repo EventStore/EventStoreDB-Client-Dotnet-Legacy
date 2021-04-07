@@ -11,18 +11,18 @@ namespace EventStore.ClientAPI {
 		}
 
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task does_not_throw_when_server_is_down(bool useSsl) {
-			using var connection = _fixture.CreateConnection(builder => builder.UseSsl(useSsl),
-				1114);
+		[Fact]
+		public async Task does_not_throw_when_server_is_down() {
+			using var connection = _fixture.CreateConnection(port: 1114);
 			await connection.ConnectAsync().WithTimeout();
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task reopening_a_closed_connection_throws(bool useSsl) {
+		[Fact]
+		public async Task reopening_a_closed_connection_throws() {
 			var closedSource = new TaskCompletionSource<bool>();
 			using var connection = _fixture.CreateConnection(builder => builder
-					.UseSsl(useSsl)
+					.UseSsl(true)
+					.DisableServerCertificateValidation()
 					.LimitReconnectionsTo(0)
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
@@ -38,11 +38,12 @@ namespace EventStore.ClientAPI {
 			await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.ConnectAsync().WithTimeout());
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task closes_after_configured_amount_of_failed_reconnections(bool useSsl) {
+		[Fact]
+		public async Task closes_after_configured_amount_of_failed_reconnections() {
 			var closedSource = new TaskCompletionSource<bool>();
 			using var connection = _fixture.CreateConnection(
-				builder => builder.UseSsl(useSsl)
+				builder => builder.UseSsl(true)
+					.DisableServerCertificateValidation()
 					.LimitReconnectionsTo(1)
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
@@ -69,11 +70,12 @@ namespace EventStore.ClientAPI {
 				_fixture.CreateTestEvents()).WithTimeout());
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task can_connect_to_dns_endpoint(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
+		[Fact]
+		public async Task can_connect_to_dns_endpoint() {
+			var streamName = GetStreamName();
 			using var connection = _fixture.CreateConnection(
-				builder => builder.UseSsl(useSsl)
+				builder => builder.UseSsl(true)
+					.DisableServerCertificateValidation()
 					.LimitReconnectionsTo(1)
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
@@ -85,20 +87,20 @@ namespace EventStore.ClientAPI {
 		}
 
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task can_connect_to_ip_endpoint_with_connection_string(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			using var connection = EventStoreClientAPIFixture.CreateConnectionWithConnectionString(useSsl);
+		[Fact]
+		public async Task can_connect_to_ip_endpoint_with_connection_string() {
+			var streamName = GetStreamName();
+			using var connection = EventStoreClientAPIFixture.CreateConnectionWithConnectionString();
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task can_connect_to_dns_endpoint_with_connection_string(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			using var connection = EventStoreClientAPIFixture.CreateConnectionWithConnectionString(useSsl, null, null, true);
+		[Fact]
+		public async Task can_connect_to_dns_endpoint_with_connection_string() {
+			var streamName = GetStreamName();
+			using var connection = EventStoreClientAPIFixture.CreateConnectionWithConnectionString(null, null, true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());

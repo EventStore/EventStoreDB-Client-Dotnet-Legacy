@@ -11,10 +11,10 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task for_non_existing_stream_returns_default(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task for_non_existing_stream_returns_default() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 			var meta = await connection.GetStreamMetadataAsync(streamName).WithTimeout();
 			Assert.Equal(streamName, meta.Stream);
 			Assert.False(meta.IsStreamDeleted);
@@ -25,10 +25,10 @@ namespace EventStore.ClientAPI {
 			Assert.False(meta.StreamMetadata.CacheControl.HasValue);
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task for_hard_deleted_stream_returns_default_with_stream_deletion(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task for_hard_deleted_stream_returns_default_with_stream_deletion() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 			await connection.SetStreamMetadataAsync(streamName, ExpectedVersion.NoStream, StreamMetadata.Create())
 				.WithTimeout();
 
@@ -44,10 +44,10 @@ namespace EventStore.ClientAPI {
 			Assert.False(meta.StreamMetadata.CacheControl.HasValue);
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task for_existing_stream_returns_set_metadata(bool useSsl) {
-			var streamName = $"{GetStreamName()}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		[Fact]
+		public async Task for_existing_stream_returns_set_metadata() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
 			var metadata = StreamMetadata.Create(
 				maxCount: 0xDEAD,
 				maxAge: TimeSpan.FromSeconds(0xFAD),

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Xunit;
 
@@ -17,12 +16,9 @@ namespace EventStore.ClientAPI {
 				(ExpectedVersion.NoStream, nameof(ExpectedVersion.NoStream))
 			};
 
-		public static IEnumerable<object[]> UseSslTestCases() => UseSsl.Select(useSsl => new object[] {useSsl});
-
 		public static IEnumerable<object[]> ExpectedVersionTestCases() {
-			foreach (var (expectedVersion, displayName) in ExpectedVersions)
-			foreach (var useSsl in UseSsl) {
-				yield return new object[] {expectedVersion, displayName, useSsl};
+			foreach (var (expectedVersion, displayName) in ExpectedVersions) {
+				yield return new object[] {expectedVersion, displayName};
 			}
 		}
 	}

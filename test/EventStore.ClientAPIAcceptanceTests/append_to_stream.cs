@@ -11,9 +11,9 @@ namespace EventStore.ClientAPI {
 		}
 
 		[Theory, MemberData(nameof(ExpectedVersionTestCases))]
-		public async Task expected_version(long expectedVersion, string displayName, bool useSsl) {
-			var streamName = $"{GetStreamName()}_{displayName}_{useSsl}";
-			var connection = _fixture.Connections[useSsl];
+		public async Task expected_version(long expectedVersion, string displayName) {
+			var streamName = $"{GetStreamName()}_{displayName}";
+			var connection = _fixture.Connection;
 
 			var result = await connection.AppendToStreamAsync(streamName, expectedVersion, _fixture.CreateTestEvents())
 				.WithTimeout();
@@ -22,10 +22,10 @@ namespace EventStore.ClientAPI {
 				.WithTimeout();
 		}
 
-		[Theory, MemberData(nameof(UseSslTestCases))]
-		public async Task wrong_expected_version(bool useSsl) {
+		[Fact]
+		public async Task wrong_expected_version() {
 			var streamName = GetStreamName();
-			var connection = _fixture.Connections[useSsl];
+			var connection = _fixture.Connection;
 
 			var ex = await Assert.ThrowsAsync<WrongExpectedVersionException>(() =>
 					connection.AppendToStreamAsync(streamName, ExpectedVersion.StreamExists,
