@@ -26,7 +26,6 @@
 			..\EventStore.ClientAPIAcceptanceTests\docker-compose.yml;
 			..\EventStore.ClientAPIAcceptanceTests\shared.env;
 		" CopyToOutputDirectory="Always"/>
-<!--		<Content Include="..\..\certs\**\*" CopyToOutputDirectory="Always" LinkBase="certs" />-->
 	</ItemGroup>
 
 </Project>
