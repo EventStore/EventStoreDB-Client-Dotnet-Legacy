@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<DefineConstants>CLIENT_API</DefineConstants>
+		<LinkBase>true</LinkBase>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Transport.Tcp\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Remove="Transport.Tcp\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Transport.Tcp\**" />
+	</ItemGroup>
+</Project>
