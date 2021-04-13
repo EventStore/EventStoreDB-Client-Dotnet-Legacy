@@ -25,13 +25,16 @@ namespace EventStore.ClientAPI {
 						State = nodeState,
 						IsAlive = true,
 						ExternalTcpIp = "127.0.0.1",
-						ExternalTcpPort = 1113
+						ExternalTcpPort = 1113,
+						HttpEndPointIp = "127.0.0.1",
+						HttpEndPointPort = 2113
 					},
 					new ClusterMessages.MemberInfoDto {
 						State = ClusterMessages.VNodeState.Unknown,
 						IsAlive = true,
 						ExternalTcpIp = "127.0.0.1",
-						ExternalTcpPort = 2113
+						ExternalTcpPort = 1112,
+						HttpEndPointPort = 2112
 					}
 				}
 			};
@@ -43,7 +46,7 @@ namespace EventStore.ClientAPI {
 				new TestHttpClient(response.ToJson()));
 
 			var result = await sut.DiscoverAsync(new IPEndPoint(IPAddress.Any, 1113));
-			Assert.Equal(1113, EndPointExtensions.GetPort(result.TcpEndPoint));
+			Assert.Equal(1113, result.TcpEndPoint.GetPort());
 		}
 	}
 

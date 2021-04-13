@@ -19,10 +19,4 @@
 		<PackageReference Include="IndexRange" Version="1.0.0" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
-	<ItemGroup>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-			<_Parameter1>EventStore.ClientAPI.Tests</_Parameter1>
-		</AssemblyAttribute>
-	</ItemGroup>
-
 </Project>

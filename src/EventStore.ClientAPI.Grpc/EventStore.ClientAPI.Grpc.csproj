@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<PackageId>EventStore.Client.Grpc</PackageId>
+		<Description>The client API for Event Store. Get the open source or commercial versions of Event Store server from https://eventstore.com/</Description>
+		<LinkBase>true</LinkBase>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.15.8" />
+	</ItemGroup>
+	<ItemGroup Condition="$(TargetFramework) != 'net5.0'">
+		<PackageReference Include="Grpc.Core" Version="$(GrpcPackageVersion)" />
+		<PackageReference Include="System.Text.Json" Version="5.0.0" />
+	</ItemGroup>
+	<ItemGroup Condition="$(TargetFramework) == 'net5.0'">
+		<PackageReference Include="Grpc.Net.Client" Version="$(GrpcPackageVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+		<Protobuf Access="internal" Include="protos/*.proto" GrpcServices="Client" ProtoRoot="protos" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="../EventStore.ClientAPI/EventStore.ClientAPI.csproj" />
+	</ItemGroup>
+</Project>

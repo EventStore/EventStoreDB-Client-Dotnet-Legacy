@@ -1,18 +1,21 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
-using EventStore.ClientAPI.Common.Utils;
 
 namespace EventStore.ClientAPI.Internal {
 	internal class StaticEndPointDiscoverer : IEndPointDiscoverer {
-		private readonly Task<NodeEndPoints> _task;
+		private readonly TaskCompletionSource<NodeEndPoints> _source;
 
-		public StaticEndPointDiscoverer(EndPoint endPoint, bool isSsl) {
-			Ensure.NotNull(endPoint, "endPoint");
-			_task = Task.Factory.StartNew(() => new NodeEndPoints(isSsl ? null : endPoint, isSsl ? endPoint : null));
+		public StaticEndPointDiscoverer(EndPoint endPoint, bool isSsl) : this(endPoint, null, isSsl) {
 		}
 
-		public Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) {
-			return _task;
+		public StaticEndPointDiscoverer(EndPoint endPoint, EndPoint httpEndPoint, bool isSsl) {
+			if (endPoint == null) throw new ArgumentNullException(nameof(endPoint));
+			_source = new TaskCompletionSource<NodeEndPoints>();
+			_source.SetResult(new NodeEndPoints(isSsl ? null : endPoint,
+				isSsl ? endPoint : null, httpEndPoint));
 		}
+
+		public Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) => _source.Task;
 	}
 }

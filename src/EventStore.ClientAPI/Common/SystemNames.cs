@@ -1,5 +1,5 @@
 ﻿namespace EventStore.ClientAPI.Common {
-	static class SystemStreams {
+	public static class SystemStreams {
 		public const string StreamsStream = "$streams";
 		public const string SettingsStream = "$settings";
 		public const string StatsStreamPrefix = "$stats";
