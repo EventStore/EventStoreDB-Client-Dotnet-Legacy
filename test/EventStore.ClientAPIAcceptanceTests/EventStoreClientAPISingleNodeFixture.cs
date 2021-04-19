@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -13,7 +12,7 @@ using Xunit;
 namespace EventStore.ClientAPI {
 	public partial class EventStoreClientAPISingleNodeFixture : IAsyncLifetime {
 		private static readonly string HostCertificatePath =
-			Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "..", "..", "..", "certs"));
+			Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "..", "..", "certs"));
 
 		private readonly IContainerService _eventStore;
 
@@ -40,7 +39,7 @@ namespace EventStore.ClientAPI {
 				.ExposePort(2113, 2113)
 				.MountVolume(HostCertificatePath, "/etc/eventstore/certs", MountType.ReadOnly)
 				.Build();
-			Connection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113);
+			Connection = CreateConnection(settings => settings.DisableServerCertificateValidation());
 		}
 
 		public async Task InitializeAsync() {

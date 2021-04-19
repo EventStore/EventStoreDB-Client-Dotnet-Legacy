@@ -25,7 +25,7 @@ namespace EventStore.ClientAPI {
 
 		public void SetEndPoint(EndPoint value) => _current = value;
 
-		public async Task<ChannelBase> GetCurrentChannel() {
+		public async ValueTask<ChannelBase> GetCurrentChannel() {
 			if (Interlocked.CompareExchange(ref _disposed, 0, 0) != 0) {
 				throw new ObjectDisposedException(GetType().ToString());
 			}

@@ -8,7 +8,6 @@ using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Messages;
 using EventStore.ClientAPI.Transport.Http;
 using System.Linq;
-using System.Net.Http;
 using HttpStatusCode = EventStore.ClientAPI.Transport.Http.HttpStatusCode;
 
 namespace EventStore.ClientAPI.Internal {
@@ -66,7 +65,7 @@ namespace EventStore.ClientAPI.Internal {
 		public Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) {
 			return Task.Factory.StartNew(() => {
 				var maxDiscoverAttemptsStr = "";
-				if (_maxDiscoverAttempts != Int32.MaxValue)
+				if (_maxDiscoverAttempts != int.MaxValue)
 					maxDiscoverAttemptsStr = "/" + _maxDiscoverAttempts;
 
 				for (int attempt = 1; attempt <= _maxDiscoverAttempts; ++attempt) {

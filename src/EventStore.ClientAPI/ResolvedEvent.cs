@@ -55,16 +55,22 @@ namespace EventStore.ClientAPI {
 			get { return OriginalEvent.EventNumber; }
 		}
 
-		internal ResolvedEvent(ClientMessage.ResolvedEvent evnt) {
-			Event = evnt.Event == null ? null : new RecordedEvent(evnt.Event);
-			Link = evnt.Link == null ? null : new RecordedEvent(evnt.Link);
-			OriginalPosition = new Position(evnt.CommitPosition, evnt.PreparePosition);
+		internal ResolvedEvent(ClientMessage.ResolvedEvent evnt) : this(
+			evnt.Event == null ? null : new RecordedEvent(evnt.Event),
+			evnt.Link == null ? null : new RecordedEvent(evnt.Link),
+			new Position(evnt.CommitPosition, evnt.PreparePosition)) {
 		}
 
-		internal ResolvedEvent(ClientMessage.ResolvedIndexedEvent evnt) {
-			Event = evnt.Event == null ? null : new RecordedEvent(evnt.Event);
-			Link = evnt.Link == null ? null : new RecordedEvent(evnt.Link);
-			OriginalPosition = null;
+		internal ResolvedEvent(ClientMessage.ResolvedIndexedEvent evnt): this(
+			evnt.Event == null ? null : new RecordedEvent(evnt.Event),
+			evnt.Link == null ? null : new RecordedEvent(evnt.Link),
+			null) {
+		}
+
+		internal ResolvedEvent(RecordedEvent @event, RecordedEvent link, Position? originalPosition) {
+			Event = @event;
+			Link = link;
+			OriginalPosition = originalPosition;
 		}
 
 		Position? IResolvedEvent.OriginalPosition => OriginalPosition;

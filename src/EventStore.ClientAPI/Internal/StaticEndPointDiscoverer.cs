@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 
 namespace EventStore.ClientAPI.Internal {
@@ -10,7 +9,6 @@ namespace EventStore.ClientAPI.Internal {
 		}
 
 		public StaticEndPointDiscoverer(EndPoint endPoint, EndPoint httpEndPoint, bool isSsl) {
-			if (endPoint == null) throw new ArgumentNullException(nameof(endPoint));
 			_source = new TaskCompletionSource<NodeEndPoints>();
 			_source.SetResult(new NodeEndPoints(isSsl ? null : endPoint,
 				isSsl ? endPoint : null, httpEndPoint));

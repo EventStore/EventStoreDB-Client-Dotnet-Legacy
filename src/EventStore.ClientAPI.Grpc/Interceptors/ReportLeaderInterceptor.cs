@@ -2,11 +2,10 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using EventStore.ClientAPI;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
 
-namespace EventStore.Client.Interceptors {
+namespace EventStore.ClientAPI.Interceptors {
 	internal class ReportLeaderInterceptor : Interceptor {
 		private readonly Action<EndPoint> _reportNewLeader;
 

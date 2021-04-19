@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
-using EventStore.Client.Interceptors;
 using EventStore.ClientAPI.Exceptions;
 using Grpc.Core;
 using Grpc.Core.Interceptors;

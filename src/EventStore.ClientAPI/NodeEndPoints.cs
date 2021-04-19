@@ -29,7 +29,7 @@ namespace EventStore.ClientAPI {
 		/// <param name="secureTcpEndPoint">The ssl endpoint of the node</param>
 		/// <param name="httpEndPoint">The http endpoint of the node</param>
 		public NodeEndPoints(EndPoint tcpEndPoint, EndPoint secureTcpEndPoint, EndPoint httpEndPoint = null) {
-			if ((tcpEndPoint ?? secureTcpEndPoint) == null) throw new ArgumentException("Both endpoints are null.");
+			if ((tcpEndPoint ?? secureTcpEndPoint ?? httpEndPoint) == null) throw new ArgumentException("Both endpoints are null.");
 			TcpEndPoint = tcpEndPoint;
 			SecureTcpEndPoint = secureTcpEndPoint;
 			HttpEndPoint = httpEndPoint;

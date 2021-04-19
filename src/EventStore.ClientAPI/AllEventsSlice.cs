@@ -34,24 +34,16 @@ namespace EventStore.ClientAPI {
 		}
 
 		internal AllEventsSlice(ReadDirection readDirection, Position fromPosition, Position nextPosition,
-			ClientMessage.ResolvedEvent[] events) : this(readDirection, fromPosition, nextPosition, events,
+			ResolvedEvent[] events) : this(readDirection, fromPosition, nextPosition, events,
 			events == null || events.Length == 0) {
 		}
 
 		internal AllEventsSlice(ReadDirection readDirection, Position fromPosition, Position nextPosition,
-			ClientMessage.ResolvedEvent[] events, bool isEndOfStream) {
+			ResolvedEvent[] events, bool isEndOfStream) {
 			ReadDirection = readDirection;
 			FromPosition = fromPosition;
 			NextPosition = nextPosition;
-			if (events == null)
-				Events = Empty.ResolvedEvents;
-			else {
-				Events = new ResolvedEvent[events.Length];
-				for (int i = 0; i < Events.Length; ++i) {
-					Events[i] = new ResolvedEvent(events[i]);
-				}
-			}
-
+			Events = events;
 			IsEndOfStream = isEndOfStream;
 		}
 	}

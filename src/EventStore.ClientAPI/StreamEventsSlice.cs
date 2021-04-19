@@ -51,7 +51,7 @@ namespace EventStore.ClientAPI {
 			string stream,
 			long fromEventNumber,
 			ReadDirection readDirection,
-			ClientMessage.ResolvedIndexedEvent[] events,
+			ResolvedEvent[] events,
 			long nextEventNumber,
 			long lastEventNumber,
 			bool isEndOfStream) {
@@ -61,15 +61,7 @@ namespace EventStore.ClientAPI {
 			Stream = stream;
 			FromEventNumber = fromEventNumber;
 			ReadDirection = readDirection;
-			if (events == null || events.Length == 0)
-				Events = Empty.ResolvedEvents;
-			else {
-				Events = new ResolvedEvent[events.Length];
-				for (int i = 0; i < Events.Length; ++i) {
-					Events[i] = new ResolvedEvent(events[i]);
-				}
-			}
-
+			Events = events;
 			NextEventNumber = nextEventNumber;
 			LastEventNumber = lastEventNumber;
 			IsEndOfStream = isEndOfStream;

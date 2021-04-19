@@ -1,14 +1,18 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Polly;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace EventStore.ClientAPI {
 	public class connect : EventStoreClientAPITest {
 		private readonly EventStoreClientAPIFixture _fixture;
+		private readonly ITestOutputHelper _testOutputHelper;
 
-		public connect(EventStoreClientAPIFixture fixture) {
+		public connect(EventStoreClientAPIFixture fixture, ITestOutputHelper testOutputHelper) {
 			_fixture = fixture;
+			_testOutputHelper = testOutputHelper;
 		}
 
 
@@ -61,14 +65,14 @@ namespace EventStore.ClientAPI {
 					.FailOnNoServerResponse(),
 				useStandardPort: true);
 			connection.Closed += delegate { closedSource.TrySetResult(true); };
-			connection.Connected += (s, e) => Console.WriteLine(
+			connection.Connected += (_, e) => _testOutputHelper.WriteLine(
 				"EventStoreConnection '{0}': connected to [{1}]...", e.Connection.ConnectionName, e.RemoteEndPoint);
-			connection.Reconnecting += (s, e) =>
-				Console.WriteLine("EventStoreConnection '{0}': reconnecting...", e.Connection.ConnectionName);
-			connection.Disconnected += (s, e) =>
-				Console.WriteLine("EventStoreConnection '{0}': disconnected from [{1}]...",
+			connection.Reconnecting += (_, e) =>
+				_testOutputHelper.WriteLine("EventStoreConnection '{0}': reconnecting...", e.Connection.ConnectionName);
+			connection.Disconnected += (_, e) =>
+				_testOutputHelper.WriteLine("EventStoreConnection '{0}': disconnected from [{1}]...",
 					e.Connection.ConnectionName, e.RemoteEndPoint);
-			connection.ErrorOccurred += (s, e) => Console.WriteLine("EventStoreConnection '{0}': error = {1}",
+			connection.ErrorOccurred += (_, e) => _testOutputHelper.WriteLine("EventStoreConnection '{0}': error = {1}",
 				e.Connection.ConnectionName, e.Exception);
 
 			await connection.ConnectAsync().WithTimeout();

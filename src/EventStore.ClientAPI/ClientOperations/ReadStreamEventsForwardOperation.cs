@@ -5,8 +5,8 @@ using EventStore.ClientAPI.Messages;
 using EventStore.ClientAPI.SystemData;
 
 namespace EventStore.ClientAPI.ClientOperations {
-	internal class
-		ReadStreamEventsForwardOperation : OperationBase<StreamEventsSlice, ClientMessage.ReadStreamEventsCompleted> {
+	internal class ReadStreamEventsForwardOperation
+		: OperationBase<StreamEventsSlice, ClientMessage.ReadStreamEventsCompleted> {
 		private readonly string _stream;
 		private readonly long _fromEventNumber;
 		private readonly int _maxCount;
@@ -53,21 +53,18 @@ namespace EventStore.ClientAPI.ClientOperations {
 			}
 		}
 
-		protected override StreamEventsSlice TransformResponse(ClientMessage.ReadStreamEventsCompleted response) {
-			return new StreamEventsSlice(StatusCode.Convert(response.Result),
+		protected override StreamEventsSlice TransformResponse(ClientMessage.ReadStreamEventsCompleted response) =>
+			new(StatusCode.Convert(response.Result),
 				_stream,
 				_fromEventNumber,
 				ReadDirection.Forward,
-				response.Events,
+				Array.ConvertAll(response.Events ?? Array.Empty<ClientMessage.ResolvedIndexedEvent>(),
+					e => new ResolvedEvent(e)),
 				response.NextEventNumber,
 				response.LastEventNumber,
 				response.IsEndOfStream);
-		}
 
-		public override string ToString() {
-			return string.Format(
-				"Stream: {0}, FromEventNumber: {1}, MaxCount: {2}, ResolveLinkTos: {3}, RequireLeader: {4}",
-				_stream, _fromEventNumber, _maxCount, _resolveLinkTos, _requireLeader);
-		}
+		public override string ToString() =>
+			$"Stream: {_stream}, FromEventNumber: {_fromEventNumber}, MaxCount: {_maxCount}, ResolveLinkTos: {_resolveLinkTos}, RequireLeader: {_requireLeader}";
 	}
 }

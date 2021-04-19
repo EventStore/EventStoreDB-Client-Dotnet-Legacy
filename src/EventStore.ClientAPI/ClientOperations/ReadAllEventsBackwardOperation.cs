@@ -5,8 +5,8 @@ using EventStore.ClientAPI.Messages;
 using EventStore.ClientAPI.SystemData;
 
 namespace EventStore.ClientAPI.ClientOperations {
-	internal class
-		ReadAllEventsBackwardOperation : OperationBase<AllEventsSlice, ClientMessage.ReadAllEventsCompleted> {
+	internal class ReadAllEventsBackwardOperation
+		: OperationBase<AllEventsSlice, ClientMessage.ReadAllEventsCompleted> {
 		private readonly Position _position;
 		private readonly int _maxCount;
 		private readonly bool _resolveLinkTos;
@@ -23,10 +23,9 @@ namespace EventStore.ClientAPI.ClientOperations {
 			_requireLeader = requireLeader;
 		}
 
-		protected override object CreateRequestDto() {
-			return new ClientMessage.ReadAllEvents(_position.CommitPosition, _position.PreparePosition, _maxCount,
+		protected override object CreateRequestDto() =>
+			new ClientMessage.ReadAllEvents(_position.CommitPosition, _position.PreparePosition, _maxCount,
 				_resolveLinkTos, _requireLeader);
-		}
 
 		protected override InspectionResult InspectResponse(ClientMessage.ReadAllEventsCompleted response) {
 			switch (response.Result) {
@@ -41,20 +40,18 @@ namespace EventStore.ClientAPI.ClientOperations {
 					Fail(new AccessDeniedException("Read access denied for $all."));
 					return new InspectionResult(InspectionDecision.EndOperation, "AccessDenied");
 				default:
-					throw new Exception(string.Format("Unexpected ReadAllResult: {0}.", response.Result));
+					throw new Exception($"Unexpected ReadAllResult: {response.Result}.");
 			}
 		}
 
-		protected override AllEventsSlice TransformResponse(ClientMessage.ReadAllEventsCompleted response) {
-			return new AllEventsSlice(ReadDirection.Backward,
+		protected override AllEventsSlice TransformResponse(ClientMessage.ReadAllEventsCompleted response) =>
+			new(ReadDirection.Backward,
 				new Position(response.CommitPosition, response.PreparePosition),
 				new Position(response.NextCommitPosition, response.NextPreparePosition),
-				response.Events);
-		}
+				Array.ConvertAll(response.Events ?? Array.Empty<ClientMessage.ResolvedEvent>(),
+					e => new ResolvedEvent(e)));
 
-		public override string ToString() {
-			return string.Format("Position: {0}, MaxCount: {1}, ResolveLinkTos: {2}, RequireLeader: {3}",
-				_position, _maxCount, _resolveLinkTos, _requireLeader);
-		}
+		public override string ToString() =>
+			$"Position: {_position}, MaxCount: {_maxCount}, ResolveLinkTos: {_resolveLinkTos}, RequireLeader: {_requireLeader}";
 	}
 }

@@ -1,9 +1,10 @@
 using System;
 #if !NET5_0_OR_GREATER
 using System.Collections.Generic;
-#endif
+#else
 using System.Net.Http;
 using System.Threading;
+#endif
 using Grpc.Core;
 #if NET5_0_OR_GREATER
 using Grpc.Net.Client;
@@ -20,8 +21,8 @@ namespace EventStore.ClientAPI {
 
 			return GrpcChannel.ForAddress(address, new GrpcChannelOptions {
 				HttpClient = new HttpClient(settings.CustomHttpMessageHandler ?? new SocketsHttpHandler {
-					KeepAlivePingDelay = settings.HeartbeatInterval,
-					KeepAlivePingTimeout = settings.HeartbeatTimeout
+					//KeepAlivePingDelay = Math.Max(settings.HeartbeatInterval, TimeSpan.FromSeconds(1)),
+					//KeepAlivePingTimeout = Math.Max(settings.HeartbeatTimeout, TimeSpan.FromSeconds(1))
 				}, true) {
 					Timeout = Timeout.InfiniteTimeSpan,
 					DefaultRequestVersion = new Version(2, 0),
@@ -41,7 +42,7 @@ namespace EventStore.ClientAPI {
 			}
 
 			static int GetValue(int value) => value switch {
-				{ } v when v < 0 => int.MaxValue,
+				< 0 => int.MaxValue,
 				_ => value
 			};
 #endif
