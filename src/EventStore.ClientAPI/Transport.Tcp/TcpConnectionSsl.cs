@@ -171,7 +171,7 @@ namespace EventStore.ClientAPI.Transport.Tcp {
 
 			if (sslPolicyErrors == SslPolicyErrors.None)
 				return true;
-			_log.Error("[S{0}, L{1}]: Certificate error: {1}", RemoteEndPoint, LocalEndPoint, sslPolicyErrors);
+			_log.Error("[S{0}, L{1}]: Certificate error: {2}", RemoteEndPoint, LocalEndPoint, sslPolicyErrors);
 			// Do not allow this client to communicate with unauthenticated servers. 
 			return false;
 		}
