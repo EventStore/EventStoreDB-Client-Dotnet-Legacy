@@ -513,23 +513,6 @@ namespace EventStore.ClientAPI.Internal {
 			return subscription.Start();
 		}
 
-		// public EventStorePersistentSubscription ConnectToPersistentSubscriptionForAll(
-		// 	string groupName,
-		// 	Action<EventStorePersistentSubscription, ResolvedEvent> eventAppeared,
-		// 	Action<EventStorePersistentSubscription, SubscriptionDropReason, Exception> subscriptionDropped = null,
-		// 	UserCredentials userCredentials = null,
-		// 	int? bufferSize = null,
-		// 	bool autoAck = true)
-		// {
-		// 	return ConnectToPersistentSubscription(groupName,
-		// 		SystemStreams.AllStream,
-		// 		eventAppeared,
-		// 		subscriptionDropped,
-		// 		userCredentials,
-		// 		bufferSize,
-		// 		autoAck);
-		// }
-
 		public async Task CreatePersistentSubscriptionAsync(string stream, string groupName,
 			PersistentSubscriptionSettings settings, UserCredentials credentials = null) {
 			Ensure.NotNullOrEmpty(stream, "stream");
@@ -556,15 +539,6 @@ namespace EventStore.ClientAPI.Internal {
 			await source.Task.ConfigureAwait(false);
 		}
 
-        // public Task<PersistentSubscriptionCreateResult> CreatePersistentSubscriptionForAllAsync(string groupName, PersistentSubscriptionSettings settings, UserCredentials userCredentials = null)
-        // {
-        //     Ensure.NotNullOrEmpty(groupName, "groupName");
-        //     Ensure.NotNull(settings, "settings");
-        //     var source = new TaskCompletionSource<PersistentSubscriptionCreateResult>(TaskCreationOptions.RunContinuationsAsynchronously);
-        //     EnqueueOperation(new CreatePersistentSubscriptionOperation(_settings.Log, source, SystemStreams.AllStream, groupName, settings, userCredentials));
-        //     return source.Task;
-        // }
-
 		public async Task DeletePersistentSubscriptionAsync(string stream, string groupName,
 			UserCredentials userCredentials = null) {
 			Ensure.NotNullOrEmpty(stream, "stream");
@@ -575,14 +549,6 @@ namespace EventStore.ClientAPI.Internal {
 			await EnqueueOperation(operation).ConfigureAwait(false);
 			await source.Task.ConfigureAwait(false);
 		}
-
-        // public Task<PersistentSubscriptionDeleteResult> DeletePersistentSubscriptionForAllAsync(string groupName, UserCredentials userCredentials = null)
-        // {
-        //     Ensure.NotNullOrEmpty(groupName, "groupName");
-        //     var source = new TaskCompletionSource<PersistentSubscriptionDeleteResult>(TaskCreationOptions.RunContinuationsAsynchronously);
-        //     EnqueueOperation(new DeletePersistentSubscriptionOperation(_settings.Log, source, SystemStreams.AllStream, groupName, userCredentials));
-        //     return source.Task;
-        // }
 
 		public Task<WriteResult> SetStreamMetadataAsync(string stream, long expectedMetastreamVersion,
 			StreamMetadata metadata, UserCredentials userCredentials = null) {
