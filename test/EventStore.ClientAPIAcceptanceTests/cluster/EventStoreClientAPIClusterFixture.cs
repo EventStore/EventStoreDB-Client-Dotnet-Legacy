@@ -17,6 +17,7 @@ namespace EventStore.ClientAPI {
 			_eventStoreCluster = new Builder()
 				.UseContainer()
 				.UseCompose()
+				.WithEnvironment(GlobalEnvironment.EnvironmentVariables)
 				.FromFile("docker-compose.yml")
 				.ForceRecreate()
 				.RemoveOrphans()

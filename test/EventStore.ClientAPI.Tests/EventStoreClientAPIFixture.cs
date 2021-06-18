@@ -24,7 +24,7 @@ namespace EventStore.ClientAPI {
 				? _cluster.Connection
 				: _singleNode.Connection;
 
-		public static bool UseCluster { get; set; } = false;
+		public static bool UseCluster => GlobalEnvironment.UseCluster;
 
 		public Task InitializeAsync() =>
 			UseCluster

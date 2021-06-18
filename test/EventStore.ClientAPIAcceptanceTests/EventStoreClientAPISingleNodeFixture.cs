@@ -24,7 +24,7 @@ namespace EventStore.ClientAPI {
 
 			_eventStore = new Builder()
 				.UseContainer()
-				.UseImage("docker.pkg.github.com/eventstore/eventstore/eventstore:ci")
+				.UseImage($"docker.pkg.github.com/eventstore/eventstore/eventstore:{GlobalEnvironment.ImageTag}")
 				.WithEnvironment(
 					"EVENTSTORE_MEM_DB=true",
 					"EVENTSTORE_ENABLE_EXTERNAL_TCP=true",
