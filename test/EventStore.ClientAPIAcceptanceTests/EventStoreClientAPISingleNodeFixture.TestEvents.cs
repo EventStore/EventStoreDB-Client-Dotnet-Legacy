@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace EventStore.ClientAPI {
-	partial class EventStoreClientAPIFixture {
+	partial class EventStoreClientAPISingleNodeFixture {
 		private const string TestEventType = "-";
 
 		public IEnumerable<EventData> CreateTestEvents(int count = 1)

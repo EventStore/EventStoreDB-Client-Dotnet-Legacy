@@ -13,7 +13,9 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task does_not_throw_when_server_is_down() {
-			using var connection = _fixture.CreateConnection(port: 1114);
+			using var connection = _fixture.CreateConnection(
+				configureSettings: null,
+				useStandardPort: false);
 			await connection.ConnectAsync().WithTimeout();
 		}
 
@@ -27,7 +29,8 @@ namespace EventStore.ClientAPI {
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
 					.FailOnNoServerResponse(),
-				1114);
+				useStandardPort: false);
+
 			connection.Closed += delegate { closedSource.TrySetResult(true); };
 			await connection.ConnectAsync().WithTimeout();
 
@@ -48,7 +51,7 @@ namespace EventStore.ClientAPI {
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
 					.FailOnNoServerResponse(),
-				1114);
+				useStandardPort: false);
 			connection.Closed += delegate { closedSource.TrySetResult(true); };
 			connection.Connected += (s, e) => Console.WriteLine(
 				"EventStoreConnection '{0}': connected to [{1}]...", e.Connection.ConnectionName, e.RemoteEndPoint);
@@ -79,7 +82,8 @@ namespace EventStore.ClientAPI {
 					.LimitReconnectionsTo(1)
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
-					.FailOnNoServerResponse(), 1113, true);
+					.FailOnNoServerResponse(),
+				useStandardPort: true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
@@ -90,7 +94,10 @@ namespace EventStore.ClientAPI {
 		[Fact]
 		public async Task can_connect_to_ip_endpoint_with_connection_string() {
 			var streamName = GetStreamName();
-			using var connection = EventStoreClientAPIFixture.CreateConnectionWithConnectionString();
+			using var connection = _fixture.CreateConnectionWithConnectionString(
+				configureSettings: null,
+				useStandardPort: true,
+				useDnsEndPoint: false);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
@@ -100,7 +107,10 @@ namespace EventStore.ClientAPI {
 		[Fact]
 		public async Task can_connect_to_dns_endpoint_with_connection_string() {
 			var streamName = GetStreamName();
-			using var connection = EventStoreClientAPIFixture.CreateConnectionWithConnectionString(null, null, true);
+			using var connection = _fixture.CreateConnectionWithConnectionString(
+				configureSettings: null,
+				useStandardPort: true,
+				useDnsEndPoint: true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());

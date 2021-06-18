@@ -11,7 +11,7 @@ using Polly;
 using Xunit;
 
 namespace EventStore.ClientAPI {
-	public partial class EventStoreClientAPIFixture : IAsyncLifetime {
+	public partial class EventStoreClientAPISingleNodeFixture : IAsyncLifetime {
 		private static readonly string HostCertificatePath =
 			Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "..", "..", "..", "certs"));
 
@@ -19,7 +19,7 @@ namespace EventStore.ClientAPI {
 
 		public IEventStoreConnection Connection { get; }
 
-		public EventStoreClientAPIFixture() {
+		public EventStoreClientAPISingleNodeFixture() {
 			ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
 			_eventStore = new Builder()

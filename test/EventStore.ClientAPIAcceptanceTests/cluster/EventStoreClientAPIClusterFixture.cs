@@ -11,6 +11,8 @@ namespace EventStore.ClientAPI {
 	public partial class EventStoreClientAPIClusterFixture : IAsyncLifetime {
 		private readonly ICompositeService _eventStoreCluster;
 
+		public IEventStoreConnection Connection { get; }
+
 		public EventStoreClientAPIClusterFixture() {
 			_eventStoreCluster = new Builder()
 				.UseContainer()
@@ -19,6 +21,7 @@ namespace EventStore.ClientAPI {
 				.ForceRecreate()
 				.RemoveOrphans()
 				.Build();
+			Connection = CreateConnectionWithConnectionString(useSsl: true);
 		}
 
 		public async Task InitializeAsync() {
@@ -46,9 +49,11 @@ namespace EventStore.ClientAPI {
 				_eventStoreCluster.Dispose();
 				throw;
 			}
+			await Connection.ConnectAsync();
 		}
 
 		public Task DisposeAsync() {
+			Connection.Dispose();
 			_eventStoreCluster.Stop();
 			_eventStoreCluster.Dispose();
 			return Task.CompletedTask;

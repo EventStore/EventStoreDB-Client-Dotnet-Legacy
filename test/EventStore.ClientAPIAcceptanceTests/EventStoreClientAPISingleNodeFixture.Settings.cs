@@ -1,7 +1,7 @@
 using System;
 
 namespace EventStore.ClientAPI {
-	partial class EventStoreClientAPIFixture {
+	partial class EventStoreClientAPISingleNodeFixture {
 		private ConnectionSettingsBuilder DefaultBuilder {
 			get {
 				var builder = ConnectionSettings.Create()
