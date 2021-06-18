@@ -26,6 +26,7 @@ namespace EventStore.ClientAPI {
 				.UseContainer()
 				.UseImage($"docker.pkg.github.com/eventstore/eventstore/eventstore:{GlobalEnvironment.ImageTag}")
 				.WithEnvironment(
+					"EVENTSTORE_DB_LOG_FORMAT=" + GlobalEnvironment.DbLogFormat,
 					"EVENTSTORE_MEM_DB=true",
 					"EVENTSTORE_ENABLE_EXTERNAL_TCP=true",
 					"EVENTSTORE_CERTIFICATE_FILE=/etc/eventstore/certs/node/node.crt",

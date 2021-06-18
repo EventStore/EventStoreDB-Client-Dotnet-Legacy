@@ -29,6 +29,7 @@ services:
     env_file:
       - shared.env
     environment:
+      - EVENTSTORE_DB_LOG_FORMAT=${EVENTSTORE_DB_LOG_FORMAT}
       - EVENTSTORE_GOSSIP_SEED=172.30.240.12:2113,172.30.240.13:2113
       - EVENTSTORE_INT_IP=172.30.240.11
       - EVENTSTORE_CERTIFICATE_FILE=/etc/eventstore/certs/node1/node.crt
@@ -53,6 +54,7 @@ services:
     env_file:
       - shared.env
     environment:
+      - EVENTSTORE_DB_LOG_FORMAT=${EVENTSTORE_DB_LOG_FORMAT}
       - EVENTSTORE_GOSSIP_SEED=172.30.240.11:2113,172.30.240.13:2113
       - EVENTSTORE_INT_IP=172.30.240.12
       - EVENTSTORE_CERTIFICATE_FILE=/etc/eventstore/certs/node2/node.crt
@@ -77,6 +79,7 @@ services:
     env_file:
       - shared.env
     environment:
+      - EVENTSTORE_DB_LOG_FORMAT=${EVENTSTORE_DB_LOG_FORMAT}
       - EVENTSTORE_GOSSIP_SEED=172.30.240.11:2113,172.30.240.12:2113
       - EVENTSTORE_INT_IP=172.30.240.13
       - EVENTSTORE_CERTIFICATE_FILE=/etc/eventstore/certs/node3/node.crt
