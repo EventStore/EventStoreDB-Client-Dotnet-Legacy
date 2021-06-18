@@ -22,6 +22,9 @@ namespace EventStore.ClientAPI {
 		public EventStoreClientAPISingleNodeFixture() {
 			ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
+			// todo: consider using docker-compose for here as we do with the clustered version
+			// this would save us specifying defaults in GlobalEnvironment.cs as well as the .env file
+			// might be useful to make memdb configurable too
 			_eventStore = new Builder()
 				.UseContainer()
 				.UseImage($"docker.pkg.github.com/eventstore/eventstore/eventstore:{GlobalEnvironment.ImageTag}")
