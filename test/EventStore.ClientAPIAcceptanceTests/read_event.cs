@@ -130,5 +130,26 @@ namespace EventStore.ClientAPI {
 			Assert.NotEqual(default, result.Event.Value.OriginalEvent.Created);
 			Assert.NotEqual(default, result.Event.Value.OriginalEvent.CreatedEpoch);
 		}
+
+		[Fact]
+		public async Task large_event() {
+			var streamName = GetStreamName();
+			var connection = _fixture.Connection;
+
+			var testEvents = _fixture.CreateTestEvents(1, 6_000_000).ToArray();
+			await connection.AppendToStreamAsync(streamName, ExpectedVersion.NoStream, testEvents).WithTimeout();
+
+			var result = await connection.ReadEventAsync(streamName, -1, false).WithTimeout();
+			var expected = testEvents[^1];
+
+			Assert.Equal(EventReadStatus.Success, result.Status);
+			Assert.True(result.Event.HasValue);
+			Assert.Equal(expected.EventId, result.Event.Value.OriginalEvent.EventId);
+			Assert.Equal(streamName, result.Stream);
+			Assert.Equal(-1, result.EventNumber);
+			Assert.Equal(expected.IsJson, result.Event.Value.OriginalEvent.IsJson);
+			Assert.NotEqual(default, result.Event.Value.OriginalEvent.Created);
+			Assert.NotEqual(default, result.Event.Value.OriginalEvent.CreatedEpoch);
+		}
 	}
 }
