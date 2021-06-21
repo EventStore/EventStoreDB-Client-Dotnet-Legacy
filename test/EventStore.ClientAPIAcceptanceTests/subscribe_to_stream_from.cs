@@ -78,6 +78,43 @@ namespace EventStore.ClientAPI {
 		}
 
 		[Fact]
+		public async Task from_checkpoint() {
+			var streamName = GetStreamName();
+			var caughtup = new TaskCompletionSource<ResolvedEvent>();
+			var receivedLive = new TaskCompletionSource<ResolvedEvent>();
+			var connection = _fixture.Connection;
+
+			var catchupEvents = _fixture.CreateTestEvents(5).ToArray();
+			var liveEvents = _fixture.CreateTestEvents(1).ToArray();
+
+			await connection.AppendToStreamAsync(streamName, ExpectedVersion.NoStream, catchupEvents).WithTimeout();
+
+			var lastCheckpoint = 3;
+			connection.SubscribeToStreamFrom(streamName, lastCheckpoint, CatchUpSubscriptionSettings.Default,
+				EventAppeared, subscriptionDropped: SubscriptionDropped);
+
+			var receivedCatchupEvent = await caughtup.Task.WithTimeout();
+
+			await connection.AppendToStreamAsync(streamName, catchupEvents.Length - 1, liveEvents).WithTimeout();
+
+			var receivedLiveEvent = await receivedLive.Task.WithTimeout();
+
+			Assert.Equal(catchupEvents.Last().EventId, receivedCatchupEvent.OriginalEvent.EventId);
+			Assert.Equal(liveEvents.Last().EventId, receivedLiveEvent.OriginalEvent.EventId);
+
+			Task EventAppeared(EventStoreCatchUpSubscription s, ResolvedEvent e) {
+				if (!caughtup.TrySetResult(e))
+					receivedLive.TrySetResult(e);
+				return Task.CompletedTask;
+			}
+
+			void SubscriptionDropped(EventStoreCatchUpSubscription s, SubscriptionDropReason reason, Exception ex) {
+				caughtup.TrySetException(ex ?? new ObjectDisposedException(nameof(s)));
+				receivedLive.TrySetException(ex ?? new ObjectDisposedException(nameof(s)));
+			}
+		}
+
+		[Fact]
 		public async Task drops_on_subscriber_error() {
 			var streamName = GetStreamName();
 			var droppedSource = new TaskCompletionSource<(SubscriptionDropReason, Exception)>();
