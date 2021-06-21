@@ -25,7 +25,7 @@ namespace EventStore.ClientAPI {
 				builder => builder.UseSsl(true));
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
-				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
+				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, TestEventGenerator.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 		}
 
@@ -37,7 +37,7 @@ namespace EventStore.ClientAPI {
 				useDnsEndPoint: true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
-				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
+				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, TestEventGenerator.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 		}
 
@@ -48,7 +48,7 @@ namespace EventStore.ClientAPI {
 			using var connection = _fixture.CreateConnectionWithConnectionString(useSsl: true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
-				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
+				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, TestEventGenerator.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 		}
 
@@ -58,7 +58,7 @@ namespace EventStore.ClientAPI {
 			using var connection = _fixture.CreateConnectionWithConnectionString(useSsl: true, useDnsEndPoint: true);
 			await connection.ConnectAsync().WithTimeout();
 			var writeResult =
-				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
+				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, TestEventGenerator.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 		}
 	}

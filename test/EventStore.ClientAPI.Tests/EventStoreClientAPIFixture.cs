@@ -37,9 +37,7 @@ namespace EventStore.ClientAPI {
 				: _singleNode.DisposeAsync();
 
 		public IEnumerable<EventData> CreateTestEvents(int count = 1) =>
-			UseCluster
-				? _cluster.CreateTestEvents(count)
-				: _singleNode.CreateTestEvents(count);
+			TestEventGenerator.CreateTestEvents(count);
 
 		public IEventStoreConnection CreateConnection(
 			Func<ConnectionSettingsBuilder, ConnectionSettingsBuilder> configureSettings,
