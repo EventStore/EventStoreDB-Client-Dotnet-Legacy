@@ -24,7 +24,8 @@ namespace EventStore.ClientAPI {
 		public IEventStoreConnection CreateConnectionWithGossipSeeds(
 			Func<ConnectionSettingsBuilder, ConnectionSettingsBuilder> configureSettings = default,
 			int port = 2113,
-			bool useDnsEndPoint = false) {
+			bool useDnsEndPoint = false,
+			int maxDiscoverAttempts = 1) {
 
 			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder)
 			.Build();
@@ -32,7 +33,7 @@ namespace EventStore.ClientAPI {
 			var clusterSettings = new ClusterSettingsBuilder()
 				.DiscoverClusterViaGossipSeeds()
 				.SetGossipSeedEndPoints(true, gossipSeeds)
-				.SetMaxDiscoverAttempts(1)
+				.SetMaxDiscoverAttempts(maxDiscoverAttempts)
 				.Build();
 			return EventStoreConnection.Create(settings, clusterSettings);
 		}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ductus.FluentDocker.Services;
 using Xunit;
 
 namespace EventStore.ClientAPI {
@@ -24,6 +25,11 @@ namespace EventStore.ClientAPI {
 				? _cluster.Connection
 				: _singleNode.Connection;
 
+		public IService EventStore =>
+			UseCluster
+				? _cluster.EventStore
+				: _singleNode.EventStore;
+
 		public static bool UseCluster => GlobalEnvironment.UseCluster;
 
 		public Task InitializeAsync() =>
@@ -41,13 +47,15 @@ namespace EventStore.ClientAPI {
 
 		public IEventStoreConnection CreateConnection(
 			Func<ConnectionSettingsBuilder, ConnectionSettingsBuilder> configureSettings,
-			bool useStandardPort) =>
+			bool useStandardPort,
+			int clusterMaxDiscoverAttempts = 1) =>
 
 			UseCluster
 				? _cluster.CreateConnectionWithGossipSeeds(
 					configureSettings,
 					useStandardPort ? 2113 : 2118,
-					useDnsEndPoint: true)
+					useDnsEndPoint: true,
+					maxDiscoverAttempts: clusterMaxDiscoverAttempts)
 				: _singleNode.CreateConnection(
 					configureSettings,
 					useStandardPort ? 1113 : 1114,

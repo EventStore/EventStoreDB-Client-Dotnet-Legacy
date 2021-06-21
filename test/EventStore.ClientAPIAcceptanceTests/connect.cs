@@ -105,6 +105,42 @@ namespace EventStore.ClientAPI {
 		}
 
 		[Fact]
+		public async Task can_reconnect_and_retry() {
+			var streamName = GetStreamName();
+			using var connection = _fixture.CreateConnection(
+				builder => builder.UseSsl(true)
+					.DisableServerCertificateValidation()
+					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
+					.SetReconnectionDelayTo(TimeSpan.Zero)
+					.KeepReconnecting()
+					.KeepRetrying()
+					.FailOnNoServerResponse(),
+				useStandardPort: true,
+				clusterMaxDiscoverAttempts: 20);
+			await connection.ConnectAsync().WithTimeout();
+
+			// can definitely write without throwing
+			await WriteAnEventAsync();
+
+			_fixture.EventStore.Stop();
+
+			var writeTask = WriteAnEventAsync();
+
+			// writeTask cannot complete because ES is stopped
+			await Assert.ThrowsAnyAsync<Exception>(() => writeTask.WithTimeout());
+
+			_fixture.EventStore.Start();
+
+			// same writeTask can complete now by reconnecting and retrying
+			var writeResult = await writeTask;
+
+			Assert.True(writeResult.LogPosition.PreparePosition > 0);
+
+			Task<WriteResult> WriteAnEventAsync() => connection
+				.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
+		}
+
+		[Fact]
 		public async Task can_connect_to_dns_endpoint_with_connection_string() {
 			var streamName = GetStreamName();
 			using var connection = _fixture.CreateConnectionWithConnectionString(

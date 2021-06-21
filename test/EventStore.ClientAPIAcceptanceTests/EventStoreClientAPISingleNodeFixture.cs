@@ -18,6 +18,7 @@ namespace EventStore.ClientAPI {
 		private readonly IContainerService _eventStore;
 
 		public IEventStoreConnection Connection { get; }
+		public IContainerService EventStore => _eventStore;
 
 		public EventStoreClientAPISingleNodeFixture() {
 			ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };

@@ -12,6 +12,7 @@ namespace EventStore.ClientAPI {
 		private readonly ICompositeService _eventStoreCluster;
 
 		public IEventStoreConnection Connection { get; }
+		public ICompositeService EventStore => _eventStoreCluster;
 
 		public EventStoreClientAPIClusterFixture() {
 			_eventStoreCluster = new Builder()
