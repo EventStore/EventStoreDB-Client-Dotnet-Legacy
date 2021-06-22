@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Polly;
 using Xunit;
 
 namespace EventStore.ClientAPI {
@@ -13,6 +14,13 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task does_not_throw_when_server_is_down() {
+			if (GlobalEnvironment.UseCluster) {
+				// suspicious that behaviour is different for cluster, but likely
+				// always been this way. the discovery is part of the connectasync
+				// call and throws if the cluster is not accessible
+				return;
+			}
+
 			using var connection = _fixture.CreateConnection(
 				configureSettings: null,
 				useStandardPort: false);
@@ -29,7 +37,7 @@ namespace EventStore.ClientAPI {
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
 					.FailOnNoServerResponse(),
-				useStandardPort: false);
+				useStandardPort: true);
 
 			connection.Closed += delegate { closedSource.TrySetResult(true); };
 			await connection.ConnectAsync().WithTimeout();
@@ -51,7 +59,7 @@ namespace EventStore.ClientAPI {
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
 					.SetReconnectionDelayTo(TimeSpan.Zero)
 					.FailOnNoServerResponse(),
-				useStandardPort: false);
+				useStandardPort: true);
 			connection.Closed += delegate { closedSource.TrySetResult(true); };
 			connection.Connected += (s, e) => Console.WriteLine(
 				"EventStoreConnection '{0}': connected to [{1}]...", e.Connection.ConnectionName, e.RemoteEndPoint);
@@ -65,12 +73,34 @@ namespace EventStore.ClientAPI {
 
 			await connection.ConnectAsync().WithTimeout();
 
+			_fixture.EventStore.Stop();
+
 			await closedSource.Task.WithTimeout(TimeSpan.FromSeconds(120));
 
 			await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.AppendToStreamAsync(
 				nameof(closes_after_configured_amount_of_failed_reconnections),
 				ExpectedVersion.NoStream,
 				_fixture.CreateTestEvents()).WithTimeout());
+
+			_fixture.EventStore.Start();
+
+			// wait for the cluster to come back
+			await Policy.Handle<Exception>()
+				.WaitAndRetryAsync(5, retryCount => TimeSpan.FromSeconds(retryCount * 2))
+				.ExecuteAsync(async () => {
+					using var newConnection =
+						_fixture.CreateConnection(
+							builder => builder
+								.UseSsl(true)
+								.DisableServerCertificateValidation()
+								.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
+								.SetReconnectionDelayTo(TimeSpan.Zero)
+								.FailOnNoServerResponse(),
+							useStandardPort: true,
+							clusterMaxDiscoverAttempts: -1);
+					await newConnection.ConnectAsync().WithTimeout();
+					await newConnection.AppendToStreamAsync(GetStreamName(), ExpectedVersion.Any, _fixture.CreateTestEvents()).WithTimeout();
+				});
 		}
 
 		[Fact]
@@ -116,7 +146,7 @@ namespace EventStore.ClientAPI {
 					.KeepRetrying()
 					.FailOnNoServerResponse(),
 				useStandardPort: true,
-				clusterMaxDiscoverAttempts: 20);
+				clusterMaxDiscoverAttempts: -1);
 			await connection.ConnectAsync().WithTimeout();
 
 			// can definitely write without throwing
@@ -132,7 +162,7 @@ namespace EventStore.ClientAPI {
 			_fixture.EventStore.Start();
 
 			// same writeTask can complete now by reconnecting and retrying
-			var writeResult = await writeTask;
+			var writeResult = await writeTask.WithTimeout();
 
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 

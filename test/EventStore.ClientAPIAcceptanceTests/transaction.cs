@@ -12,6 +12,9 @@ namespace EventStore.ClientAPI {
 
 		[Theory, MemberData(nameof(ExpectedVersionTestCases))]
 		public async Task expected_version(long expectedVersion, string displayName) {
+			if (GlobalEnvironment.IsLogV3)
+				return;
+
 			var streamName = $"{GetStreamName()}_{displayName}";
 			var connection = _fixture.Connection;
 
@@ -24,6 +27,9 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task wrong_expected_version() {
+			if (GlobalEnvironment.IsLogV3)
+				return;
+
 			var streamName = GetStreamName();
 			var connection = _fixture.Connection;
 

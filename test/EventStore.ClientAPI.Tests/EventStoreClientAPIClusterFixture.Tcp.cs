@@ -32,10 +32,15 @@ namespace EventStore.ClientAPI {
 			var gossipSeeds = GetGossipSeedEndPointsExceptFor(-1, port, useDnsEndPoint);
 			var clusterSettings = new ClusterSettingsBuilder()
 				.DiscoverClusterViaGossipSeeds()
-				.SetGossipSeedEndPoints(true, gossipSeeds)
-				.SetMaxDiscoverAttempts(maxDiscoverAttempts)
-				.Build();
-			return EventStoreConnection.Create(settings, clusterSettings);
+				.SetGossipSeedEndPoints(true, gossipSeeds);
+
+			if (maxDiscoverAttempts == -1) {
+				clusterSettings = clusterSettings.KeepDiscovering();
+			} else {
+				clusterSettings = clusterSettings.SetMaxDiscoverAttempts(maxDiscoverAttempts);
+			}
+
+			return EventStoreConnection.Create(settings, clusterSettings.Build());
 		}
 
 		public IEventStoreConnection CreateConnectionWithConnectionString(
