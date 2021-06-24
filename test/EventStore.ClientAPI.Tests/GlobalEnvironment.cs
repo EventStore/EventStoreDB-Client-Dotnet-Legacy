@@ -22,8 +22,8 @@ namespace EventStore.ClientAPI {
 		public static bool IsLogV2 => string.Equals(DbLogFormat, "V2", StringComparison.OrdinalIgnoreCase);
 		public static bool IsLogV3 => string.Equals(DbLogFormat, "experimentalV3", StringComparison.OrdinalIgnoreCase);
 
-		static string UseClusterName => "EVENTSTORE_CLIENT_TESTS_USE_CLUSTER";
-		static string ImageTagName => "EVENTSTORE_CLIENT_TESTS_IMAGE_TAG";
+		static string UseClusterName => "ES_USE_CLUSTER";
+		static string ImageTagName => "ES_DOCKER_TAG";
 		static string ImageTagDefault => "ci"; // e.g. "21.6.0-focal";
 		static string DbLogFormatName => "EVENTSTORE_DB_LOG_FORMAT";
 		static string DbLogFormatDefault => "V2";
