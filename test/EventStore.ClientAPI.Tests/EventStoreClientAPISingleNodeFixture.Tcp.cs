@@ -2,7 +2,7 @@ using System;
 using System.Net;
 
 namespace EventStore.ClientAPI {
-	partial class EventStoreClientAPIFixture {
+	partial class EventStoreClientAPISingleNodeFixture {
 		private const bool UseLoggerBridge = true;
 
 		public IEventStoreConnection CreateConnection(
@@ -16,7 +16,7 @@ namespace EventStore.ClientAPI {
 					: new IPEndPoint(IPAddress.Loopback, port ?? 1113));
 		}
 
-		public static IEventStoreConnection CreateConnectionWithConnectionString(string configureSettings = default,
+		public IEventStoreConnection CreateConnectionWithConnectionString(string configureSettings = default,
 			int? port = default, bool useDnsEndPoint = false) {
 			var settings = configureSettings ?? DefaultConfigureSettingsForConnectionString;
 			var host = useDnsEndPoint ? "localhost" : IPAddress.Loopback.ToString();

@@ -102,14 +102,14 @@ namespace EventStore.ClientAPI {
 		}
 
 		public async Task InitializeAsync() {
-			var connection = _fixture.Connection;;
+			var connection = _fixture.Connection;
 
 			await connection.SetStreamMetadataAsync("$all", ExpectedVersion.Any,
 				StreamMetadata.Build().SetReadRole(SystemRoles.All), DefaultUserCredentials.Admin).WithTimeout();
 		}
 
 		public async Task DisposeAsync() {
-			var connection = _fixture.Connection;;
+			var connection = _fixture.Connection;
 
 			await connection.SetStreamMetadataAsync("$all", ExpectedVersion.Any,
 				StreamMetadata.Build().SetReadRole(null), DefaultUserCredentials.Admin).WithTimeout();

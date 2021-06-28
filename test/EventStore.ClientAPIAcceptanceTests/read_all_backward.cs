@@ -12,12 +12,15 @@ namespace EventStore.ClientAPI {
 			_fixture = fixture;
 		}
 
-		[Fact]
-		public async Task returns_expected_result() {
-			var streamName = GetStreamName();
+		[Theory]
+		[InlineData("single", 1, 1)]
+		[InlineData("multiple", 3, 1)]
+		[InlineData("large", 2, 6_000_000)]
+		public async Task returns_expected_result(string suffix, int count, int metadataSize) {
+			var streamName = $"{GetStreamName()}_{suffix}";
 			var connection = _fixture.Connection;
 
-			var testEvents = _fixture.CreateTestEvents(3).ToArray();
+			var testEvents = _fixture.CreateTestEvents(count, metadataSize).ToArray();
 
 			var writeResult = await connection.AppendToStreamAsync(streamName, ExpectedVersion.NoStream, testEvents)
 				.WithTimeout();

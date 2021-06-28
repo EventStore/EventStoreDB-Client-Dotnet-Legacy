@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Ductus.FluentDocker.Builders;
+using Ductus.FluentDocker.Common;
 using Ductus.FluentDocker.Services;
 using Polly;
 using Xunit;
@@ -11,10 +12,19 @@ namespace EventStore.ClientAPI {
 	public partial class EventStoreClientAPIClusterFixture : IAsyncLifetime {
 		private readonly ICompositeService _eventStoreCluster;
 
+		public IEventStoreConnection Connection { get; }
+		public ICompositeService EventStore => _eventStoreCluster;
+
 		public EventStoreClientAPIClusterFixture() {
-			_eventStoreCluster = new Builder()
+			_eventStoreCluster = BuildCluster();
+			Connection = CreateConnectionWithConnectionString(useSsl: true);
+		}
+
+		private ICompositeService BuildCluster() {
+			return new Builder()
 				.UseContainer()
 				.UseCompose()
+				.WithEnvironment(GlobalEnvironment.EnvironmentVariables)
 				.FromFile("docker-compose.yml")
 				.ForceRecreate()
 				.RemoveOrphans()
@@ -22,7 +32,16 @@ namespace EventStore.ClientAPI {
 		}
 
 		public async Task InitializeAsync() {
-			_eventStoreCluster.Start();
+			try {
+				_eventStoreCluster.Start();
+			}
+			catch (FluentDockerException) {
+				// don't know why, sometimes the default network (e.g. net50_default) remains
+				// from previous cluster and prevents docker-compose up from executing successfully
+				BuildCluster().Dispose();
+				_eventStoreCluster.Start();
+			}
+
 			try {
 				using var httpClient = new HttpClient(new HttpClientHandler {
 					ServerCertificateCustomValidationCallback = delegate {
@@ -46,9 +65,11 @@ namespace EventStore.ClientAPI {
 				_eventStoreCluster.Dispose();
 				throw;
 			}
+			await Connection.ConnectAsync();
 		}
 
 		public Task DisposeAsync() {
+			Connection.Dispose();
 			_eventStoreCluster.Stop();
 			_eventStoreCluster.Dispose();
 			return Task.CompletedTask;

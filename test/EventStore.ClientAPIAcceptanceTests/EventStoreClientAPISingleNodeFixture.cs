@@ -11,21 +11,26 @@ using Polly;
 using Xunit;
 
 namespace EventStore.ClientAPI {
-	public partial class EventStoreClientAPIFixture : IAsyncLifetime {
+	public partial class EventStoreClientAPISingleNodeFixture : IAsyncLifetime {
 		private static readonly string HostCertificatePath =
 			Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "..", "..", "..", "certs"));
 
 		private readonly IContainerService _eventStore;
 
 		public IEventStoreConnection Connection { get; }
+		public IContainerService EventStore => _eventStore;
 
-		public EventStoreClientAPIFixture() {
+		public EventStoreClientAPISingleNodeFixture() {
 			ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
+			// todo: consider using docker-compose for here as we do with the clustered version
+			// this would save us specifying defaults in GlobalEnvironment.cs as well as the .env file
+			// might be useful to make memdb configurable too
 			_eventStore = new Builder()
 				.UseContainer()
-				.UseImage("docker.pkg.github.com/eventstore/eventstore/eventstore:ci")
+				.UseImage($"docker.pkg.github.com/eventstore/eventstore/eventstore:{GlobalEnvironment.ImageTag}")
 				.WithEnvironment(
+					"EVENTSTORE_DB_LOG_FORMAT=" + GlobalEnvironment.DbLogFormat,
 					"EVENTSTORE_MEM_DB=true",
 					"EVENTSTORE_ENABLE_EXTERNAL_TCP=true",
 					"EVENTSTORE_CERTIFICATE_FILE=/etc/eventstore/certs/node/node.crt",
