@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\EventStore.ClientAPI.Grpc\EventStore.ClientAPI.Grpc.csproj"/>
+	</ItemGroup>
+</Project>

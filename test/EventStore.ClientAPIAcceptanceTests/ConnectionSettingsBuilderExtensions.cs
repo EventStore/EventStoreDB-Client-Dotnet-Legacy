@@ -5,7 +5,7 @@ namespace EventStore.ClientAPI {
 		#if CLIENT_API_V5
 		public static ConnectionSettingsBuilder UseSsl(this ConnectionSettingsBuilder builder, bool useSsl)
 			=> useSsl ? builder.UseSslConnection(Guid.NewGuid().ToString("n"), false) : builder;
-		#elif CLIENT_API || CLIENT_API_EMBEDDED
+		#else
 		public static ConnectionSettingsBuilder UseSsl(this ConnectionSettingsBuilder builder, bool useSsl)
 			=> useSsl ? builder.DisableServerCertificateValidation() : builder.DisableTls();
 		#endif

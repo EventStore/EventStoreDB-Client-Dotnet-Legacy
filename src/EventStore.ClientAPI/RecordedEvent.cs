@@ -74,24 +74,25 @@ namespace EventStore.ClientAPI {
 		}
 #endif
 
-		internal RecordedEvent(ClientMessage.EventRecord systemRecord) {
-			EventStreamId = systemRecord.EventStreamId;
+		internal RecordedEvent(string eventStreamId, Guid eventId, long eventNumber, string eventType, byte[] data,
+			byte[] metadata, bool isJson, DateTime created, long createdEpoch) {
+			EventStreamId = eventStreamId;
+			EventId = eventId;
+			EventNumber = eventNumber;
+			EventType = eventType;
+			Data = data;
+			Metadata = metadata;
+			IsJson = isJson;
+			Created = created;
+			CreatedEpoch = createdEpoch;
+		}
 
-			EventId = new Guid(systemRecord.EventId);
-			EventNumber = systemRecord.EventNumber;
-
-			EventType = systemRecord.EventType;
-			if (systemRecord.Created.HasValue) {
-				Created = DateTime.FromBinary(systemRecord.Created.Value);
-			}
-
-			if (systemRecord.CreatedEpoch.HasValue) {
-				CreatedEpoch = systemRecord.CreatedEpoch.Value;
-			}
-
-			Data = systemRecord.Data ?? Empty.ByteArray;
-			Metadata = systemRecord.Metadata ?? Empty.ByteArray;
-			IsJson = systemRecord.DataContentType == 1;
+		internal RecordedEvent(ClientMessage.EventRecord systemRecord) : this(
+			systemRecord.EventStreamId, new Guid(systemRecord.EventId), systemRecord.EventNumber,
+			systemRecord.EventType, systemRecord.Data ?? Array.Empty<byte>(),
+			systemRecord.Metadata ?? Array.Empty<byte>(), systemRecord.DataContentType == 1,
+			systemRecord.Created.HasValue ? DateTime.FromBinary(systemRecord.Created.Value) : default,
+			systemRecord.CreatedEpoch.GetValueOrDefault()) {
 		}
 	}
 }

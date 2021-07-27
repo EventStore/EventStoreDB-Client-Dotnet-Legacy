@@ -8,7 +8,6 @@ using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Messages;
 using EventStore.ClientAPI.Transport.Http;
 using System.Linq;
-using System.Net.Http;
 using HttpStatusCode = EventStore.ClientAPI.Transport.Http.HttpStatusCode;
 
 namespace EventStore.ClientAPI.Internal {
@@ -24,6 +23,21 @@ namespace EventStore.ClientAPI.Internal {
 
 		private readonly NodePreference _nodePreference;
 		private readonly ICompatibilityMode _compatibilityMode;
+
+		private static readonly ClusterMessages.VNodeState[] _notAllowedStates = {
+			ClusterMessages.VNodeState.Manager,
+			ClusterMessages.VNodeState.ShuttingDown,
+			ClusterMessages.VNodeState.Manager,
+			ClusterMessages.VNodeState.Shutdown,
+			ClusterMessages.VNodeState.Unknown,
+			ClusterMessages.VNodeState.Initializing,
+			ClusterMessages.VNodeState.CatchingUp,
+			ClusterMessages.VNodeState.ShuttingDown,
+			ClusterMessages.VNodeState.PreLeader,
+			ClusterMessages.VNodeState.PreReplica,
+			ClusterMessages.VNodeState.PreReadOnlyReplica,
+			ClusterMessages.VNodeState.Clone
+		};
 
 		public ClusterDnsEndPointDiscoverer(ILogger log,
 			string clusterDns,
@@ -51,7 +65,7 @@ namespace EventStore.ClientAPI.Internal {
 		public Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) {
 			return Task.Factory.StartNew(() => {
 				var maxDiscoverAttemptsStr = "";
-				if (_maxDiscoverAttempts != Int32.MaxValue)
+				if (_maxDiscoverAttempts != int.MaxValue)
 					maxDiscoverAttemptsStr = "/" + _maxDiscoverAttempts;
 
 				for (int attempt = 1; attempt <= _maxDiscoverAttempts; ++attempt) {
@@ -230,23 +244,8 @@ namespace EventStore.ClientAPI.Internal {
 
 		private NodeEndPoints? TryDetermineBestNode(IEnumerable<ClusterMessages.MemberInfoDto> members,
 			NodePreference nodePreference) {
-			var notAllowedStates = new[] {
-				ClusterMessages.VNodeState.Manager,
-				ClusterMessages.VNodeState.ShuttingDown,
-				ClusterMessages.VNodeState.Manager,
-				ClusterMessages.VNodeState.Shutdown,
-				ClusterMessages.VNodeState.Unknown,
-				ClusterMessages.VNodeState.Initializing,
-				ClusterMessages.VNodeState.CatchingUp,
-				ClusterMessages.VNodeState.ShuttingDown,
-				ClusterMessages.VNodeState.PreLeader,
-				ClusterMessages.VNodeState.PreReplica,
-				ClusterMessages.VNodeState.PreReadOnlyReplica,
-				ClusterMessages.VNodeState.Clone
-			};
-
 			var nodes = members.Where(x => x.IsAlive)
-				.Where(x => !notAllowedStates.Contains(x.State))
+				.Where(x => !_notAllowedStates.Contains(x.State))
 				.OrderByDescending(x => x.State)
 				.ToArray();
 
@@ -286,14 +285,13 @@ namespace EventStore.ClientAPI.Internal {
 			var secTcp = node.ExternalSecureTcpPort > 0
 				? new DnsEndPoint(node.ExternalTcpIp, node.ExternalSecureTcpPort)
 				: null;
-			_log.Info("Discovering: found best choice [{0},{1}] ({2}).", normTcp,
-				secTcp == null ? "n/a" : secTcp.ToString(), node.State);
-			return new NodeEndPoints(normTcp, secTcp);
+			var http = new DnsEndPoint(node.HttpEndPointIp, node.HttpEndPointPort);
+			var nodeEndPoints = new NodeEndPoints(normTcp, secTcp, http);
+			_log.Info("Discovering: found best choice [{0}] ({1}).", nodeEndPoints, node.State);
+			return nodeEndPoints;
 		}
 
-		private bool IsReadOnlyReplicaState(ClusterMessages.VNodeState state) {
-			return state == ClusterMessages.VNodeState.ReadOnlyLeaderless
-				   || state == ClusterMessages.VNodeState.ReadOnlyReplica;
-		}
+		private static bool IsReadOnlyReplicaState(ClusterMessages.VNodeState state) =>
+			state is ClusterMessages.VNodeState.ReadOnlyLeaderless or ClusterMessages.VNodeState.ReadOnlyReplica;
 	}
 }

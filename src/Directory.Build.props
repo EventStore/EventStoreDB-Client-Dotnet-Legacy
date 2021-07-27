@@ -1,15 +1,33 @@
 <Project>
 	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"/>
 	<PropertyGroup>
-		<TargetFrameworks>$(TargetFrameworks);netstandard2.0</TargetFrameworks>
 		<Authors>Event Store Ltd</Authors>
 		<PackageTags>eventstore client</PackageTags>
 		<IsPackable>true</IsPackable>
+		<PackageIconUrl>ouro.png</PackageIconUrl>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageProjectUrl>https://eventstore.com</PackageProjectUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>https://eventstore.com/blog/</PackageReleaseNotes>
+		<Copyright>Copyright 2012-2020 Event Store Ltd</Copyright>
+		<MinVerTagPrefix>v</MinVerTagPrefix>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GrpcPackageVersion>2.36.0</GrpcPackageVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Grpc.Tools" Version="$(GrpcPackageVersion)">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="MinVer" Version="2.4.0" PrivateAssets="All"/>
+	</ItemGroup>
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>$(ProjectName).Tests</_Parameter1>
+		</AssemblyAttribute>
 	</ItemGroup>
 </Project>
