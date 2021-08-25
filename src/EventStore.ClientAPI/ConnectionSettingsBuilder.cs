@@ -41,6 +41,7 @@ namespace EventStore.ClientAPI {
 		private GossipSeed[] _gossipSeeds;
 		private NodePreference _nodePreference = NodePreference.Leader;
 		private string _compatibilityMode = "";
+		private bool _retryAuthenticationOnTimeout;
 		private HttpMessageHandler _customHttpMessageHandler;
 
 		internal ConnectionSettingsBuilder() {
@@ -363,7 +364,7 @@ namespace EventStore.ClientAPI {
 		}
 
 		/// <summary>
-		/// Whether to prioritize choosing a read only replica that's alive from the known nodes. 
+		/// Whether to prioritize choosing a read only replica that's alive from the known nodes.
 		/// </summary>
 		/// <returns>A <see cref="ConnectionSettingsBuilder"/> for further configuration.</returns>
 		public ConnectionSettingsBuilder PreferReadOnlyReplica() {
@@ -374,7 +375,7 @@ namespace EventStore.ClientAPI {
 
 		/// <summary>
 		/// Sets the well-known port on which the cluster gossip is taking place.
-		/// 
+		///
 		/// This should be the HTTP port that the nodes are running on. If you cannot use a well-known
 		/// port for this across all nodes, you can instead use gossip seed discovery and set
 		/// the <see cref="EndPoint" /> of some seed nodes instead.
@@ -452,6 +453,16 @@ namespace EventStore.ClientAPI {
 		}
 
 		/// <summary>
+		/// If enabled, the client will not skip authentication if the process times out. The maximun retries count is the same as
+		/// ConnectionSettings.MaxRetries.
+		/// </summary>
+		/// <returns>A <see cref="ConnectionSettingsBuilder"/> for further configuration.</returns>
+		public ConnectionSettingsBuilder RetryAuthenticationOnTimeout() {
+			_retryAuthenticationOnTimeout = true;
+			return this;
+		}
+
+		/// <summary>
 		/// Convert the mutable <see cref="ConnectionSettingsBuilder"/> object to an immutable
 		/// <see cref="ConnectionSettings"/> object.
 		/// </summary>
@@ -491,6 +502,7 @@ namespace EventStore.ClientAPI {
 				_gossipTimeout,
 				_nodePreference,
 				_compatibilityMode,
+				_retryAuthenticationOnTimeout,
 				_customHttpMessageHandler);
 		}
 	}

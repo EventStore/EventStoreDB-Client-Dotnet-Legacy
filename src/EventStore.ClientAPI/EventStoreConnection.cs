@@ -103,7 +103,7 @@ namespace EventStore.ClientAPI {
 						connectionSettings.ClientConnectionTimeout, connectionSettings.ClusterDns,
 						connectionSettings.GossipSeeds, connectionSettings.MaxDiscoverAttempts,
 						connectionSettings.GossipPort, connectionSettings.GossipTimeout,
-						connectionSettings.NodePreference, connectionSettings.CompatibilityMode, connectionSettings.CustomHttpMessageHandler);
+						connectionSettings.NodePreference, connectionSettings.CompatibilityMode, connectionSettings.RetryAuthenticationOnTimeout, connectionSettings.CustomHttpMessageHandler);
 				}
 
 				if (scheme == "discover") {
