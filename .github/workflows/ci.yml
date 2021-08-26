@@ -8,24 +8,11 @@ on:
     tags:
     - v*
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  vulnerability-scan:
-    timeout-minutes: 5
-    strategy:
-      fail-fast: false
-      matrix:
-        sdk: [5.0-focal, 3.1-bionic]
-    runs-on: ubuntu-latest
-    name: scan-vulnerabilities/${{ matrix.sdk }}
-    container: mcr.microsoft.com/dotnet/sdk:${{ matrix.sdk }}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Scan for Vulnerabilities
-      run: |
-        dotnet tool restore
-        dotnet restore
-        dotnet tool run dotnet-retire
   build-dotnet:
     timeout-minutes: 20
     strategy:
@@ -41,9 +28,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - shell: bash
-      run: |
-        git fetch --prune --unshallow
+      with:
+        fetch-depth: 0
     - name: Github Registry Docker Login
       uses: azure/docker-login@v1
       with:
@@ -51,7 +37,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull EventStore Image
-      shell: bash
       run: |
         docker pull docker.pkg.github.com/eventstore/eventstore/eventstore:${{ matrix.docker-tag }}
     - name: Install netcoreapp3.1
@@ -63,23 +48,27 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Restore
+      run: |
+        dotnet restore
+    - name: Vulnerability Scan
+      run: |
+        dotnet list package --vulnerable --include-transitive --framework=${{ matrix.framework }} | tee vulnerabilities.txt
+        ! cat vulnerabilities.txt | grep -q "has the following vulnerable packages"
     - name: Compile
-      shell: bash
       run: |
         dotnet build --configuration ${{ matrix.configuration }} --framework ${{ matrix.framework }} src/EventStore.ClientAPI${{ matrix.test }}
     - name: Run Tests
-      shell: bash
       env:
         ES_DOCKER_TAG: ${{ matrix.docker-tag }}
       run: |
         ./gencert.sh
         dotnet test --configuration ${{ matrix.configuration }} --blame \
-          --logger:html --logger:"console;verbosity=normal" \
+          --logger:html --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" \
           --results-directory=$(pwd)/test-results/test/EventStore.ClientAPI${{ matrix.test }}.Tests \
           --framework ${{ matrix.framework }} \
           test/EventStore.ClientAPI${{ matrix.test }}.Tests
     - name: Collect Test Results
-      shell: bash
       if: always()
       run: |
         echo $(find ./test-results -name "*.html" | xargs cat) > test-results.html
@@ -91,23 +80,22 @@ jobs:
         name: test-results-${{ matrix.configuration }}-${{ matrix.os }}-${{ matrix.framework }}-EventStore.ClientAPI${{ matrix.test }}.html
   publish:
     timeout-minutes: 5
-    needs: [vulnerability-scan, build-dotnet]
+    needs: [build-dotnet]
     runs-on: ubuntu-latest
     name: publish
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Get Version
       id: get_version
       run: | 
-        echo "::set-output name=branch::${GITHUB_REF:10}"
+        echo "::set-output name=branch::${GITHUB_REF}"
         
         dotnet tool restore
         version=$(dotnet tool run minver -- --tag-prefix=v)
         echo "::set-output name=version::${version}"
-    - shell: bash
-      run: |
-        git fetch --prune --unshallow
     - name: Install netcoreapp3.1
       uses: actions/setup-dotnet@v1
       with:
@@ -117,11 +105,10 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Dotnet Pack
-      shell: bash
       run: |
         dotnet pack /p:Version=${{ steps.get_version.outputs.version }} --configuration=Release --output=./packages \
           /p:NoWarn=NU5105 \
-          /p:RepositoryUrl=https://github.com/EventStore//EventStoreDB-Client-Dotnet-Legacy \
+          /p:RepositoryUrl=https://github.com/EventStore/EventStoreDB-Client-Dotnet-Legacy \
           /p:RepositoryType=git
     - name: Publish Artifacts
       uses: actions/upload-artifact@v1
@@ -129,14 +116,12 @@ jobs:
         path: packages
         name: nuget-packages
     - name: Dotnet Push to Github Packages
-      shell: bash
       if: github.event_name == 'push'
       run: |
         dotnet tool restore
         find . -name "*.nupkg" | xargs -n1 dotnet tool run gpr -- push --api-key=${{ secrets.github_token }}
     - name: Dotnet Push to Nuget.org
-      shell: bash
-      if: contains(steps.get_version.outputs.branch, 'v')
+      if: github.event_name == 'push' && startsWith(steps.get_version.outputs.branch, 'refs/tags/v')
       run: |
         dotnet tool restore
         find . -name "*.nupkg" | xargs -n1 dotnet nuget push --api-key=${{ secrets.nuget_key }} --source https://api.nuget.org/v3/index.json
