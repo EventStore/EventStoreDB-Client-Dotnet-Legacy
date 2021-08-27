@@ -162,7 +162,7 @@ namespace EventStore.ClientAPI {
 			_fixture.EventStore.Start();
 
 			// same writeTask can complete now by reconnecting and retrying
-			var writeResult = await writeTask.WithTimeout();
+			var writeResult = await writeTask.WithTimeout(timeout: TimeSpan.FromSeconds(30));
 
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 
