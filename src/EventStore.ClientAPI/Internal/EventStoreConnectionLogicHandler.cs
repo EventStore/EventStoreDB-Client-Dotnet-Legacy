@@ -12,7 +12,7 @@ using EventStore.ClientAPI.Messages;
 
 namespace EventStore.ClientAPI.Internal {
 	internal class EventStoreConnectionLogicHandler : IEventStoreConnectionLogicHandler {
-		private static readonly TimerTickMessage TimerTickMessage = new TimerTickMessage();
+		private static readonly TimerTickMessage TimerTickMessage = new();
 
 		public int TotalOperationCount {
 			get { return _operations.TotalOperationCount; }
@@ -20,7 +20,7 @@ namespace EventStore.ClientAPI.Internal {
 
 		private readonly IEventStoreConnection _esConnection;
 		private readonly ConnectionSettings _settings;
-		private readonly byte ClientVersion = 1;
+		private const byte ClientVersion = 1;
 
 		private readonly SimpleQueuedHandler _queue;
 		private readonly Timer _timer;
@@ -75,7 +75,7 @@ namespace EventStore.ClientAPI.Internal {
 			_queue.RegisterHandler<TcpConnectionClosedMessage>(msg => TcpConnectionClosed(msg.Connection));
 			_queue.RegisterHandler<HandleTcpPackageMessage>(msg => HandleTcpPackage(msg.Connection, msg.Package));
 
-			_queue.RegisterHandler<TimerTickMessage>(msg => TimerTick());
+			_queue.RegisterHandler<TimerTickMessage>(_ => TimerTick());
 
 			_timer = new Timer(_ => EnqueueMessage(TimerTickMessage), null, Consts.TimerPeriod, Consts.TimerPeriod);
 
@@ -105,14 +105,14 @@ namespace EventStore.ClientAPI.Internal {
 				case ConnectionState.Connecting:
 				case ConnectionState.Connected: {
 					task.SetException(new InvalidOperationException(
-						string.Format("EventStoreConnection '{0}' is already active.", _esConnection.ConnectionName)));
+						$"EventStoreConnection '{_esConnection.ConnectionName}' is already active."));
 					break;
 				}
 				case ConnectionState.Closed:
 					task.SetException(new ObjectDisposedException(_esConnection.ConnectionName));
 					break;
 				default:
-					task.SetException(new Exception(string.Format("Unknown state: {0}", _state)));
+					task.SetException(new Exception($"Unknown state: {_state}"));
 					break;
 			}
 		}
@@ -127,19 +127,17 @@ namespace EventStore.ClientAPI.Internal {
 
 			_connectingPhase = ConnectingPhase.EndPointDiscovery;
 
-			_endPointDiscoverer.DiscoverAsync(_connection != null ? _connection.RemoteEndPoint : null).ContinueWith(
-				t => {
-					if (t.IsFaulted) {
-						EnqueueMessage(
-							new CloseConnectionMessage("Failed to resolve TCP end point to which to connect.",
-								t.Exception));
-						completionTask?.SetException(
-							new CannotEstablishConnectionException("Cannot resolve target end point.", t.Exception));
-					} else {
-						EnqueueMessage(new EstablishTcpConnectionMessage(t.Result));
-						completionTask?.SetResult(null);
-					}
-				});
+			var discoverTask = _endPointDiscoverer.DiscoverAsync(_connection?.RemoteEndPoint);
+			discoverTask.ContinueWith(t => {
+				EnqueueMessage(new CloseConnectionMessage("Failed to resolve TCP end point to which to connect.",
+					t.Exception));
+				completionTask?.SetException(
+					new CannotEstablishConnectionException("Cannot resolve target end point.", t.Exception));
+			}, TaskContinuationOptions.NotOnRanToCompletion);
+			discoverTask.ContinueWith(t => {
+				EnqueueMessage(new EstablishTcpConnectionMessage(t.Result));
+				completionTask?.SetResult(null);
+			}, TaskContinuationOptions.OnlyOnRanToCompletion);
 		}
 
 		private void EstablishTcpConnection(NodeEndPoints endPoints) {
@@ -242,7 +240,7 @@ namespace EventStore.ClientAPI.Internal {
 			if (_state == ConnectionState.Closed || _connection != connection) {
 				LogDebug(
 					"IGNORED (_state: {0}, _conn.ID: {1:B}, conn.ID: {2:B}): TCP connection to [{3}, L{4}] closed.",
-					_state, _connection == null ? Guid.Empty : _connection.ConnectionId, connection.ConnectionId,
+					_state, _connection?.ConnectionId ?? Guid.Empty, connection.ConnectionId,
 					connection.RemoteEndPoint, connection.LocalEndPoint);
 				return;
 			}
@@ -267,7 +265,7 @@ namespace EventStore.ClientAPI.Internal {
 			if (_state != ConnectionState.Connecting || _connection != connection || connection.IsClosed) {
 				LogDebug(
 					"IGNORED (_state {0}, _conn.Id {1:B}, conn.Id {2:B}, conn.closed {3}): TCP connection to [{4}, L{5}] established.",
-					_state, _connection == null ? Guid.Empty : _connection.ConnectionId, connection.ConnectionId,
+					_state, _connection?.ConnectionId ?? Guid.Empty, connection.ConnectionId,
 					connection.IsClosed, connection.RemoteEndPoint, connection.LocalEndPoint);
 				return;
 			}
@@ -405,7 +403,7 @@ namespace EventStore.ClientAPI.Internal {
 				case ConnectionState.Closed:
 					break;
 				default:
-					throw new Exception(string.Format("Unknown state: {0}.", _state));
+					throw new Exception($"Unknown state: {_state}.");
 			}
 		}
 
@@ -429,10 +427,8 @@ namespace EventStore.ClientAPI.Internal {
 				_heartbeatInfo = new HeartbeatInfo(_heartbeatInfo.LastPackageNumber, false, _stopwatch.Elapsed);
 			} else {
 				// TcpMessage.HeartbeatTimeout analog
-				var msg = string.Format(
-					"EventStoreConnection '{0}': closing TCP connection [{1}, {2}, {3}] due to HEARTBEAT TIMEOUT at pkgNum {4}.",
-					_esConnection.ConnectionName, _connection.RemoteEndPoint, _connection.LocalEndPoint,
-					_connection.ConnectionId, packageNumber);
+				var msg =
+					$"EventStoreConnection '{_esConnection.ConnectionName}': closing TCP connection [{_connection.RemoteEndPoint}, {_connection.LocalEndPoint}, {_connection.ConnectionId}] due to HEARTBEAT TIMEOUT at pkgNum {packageNumber}.";
 				_settings.Log.Info(msg);
 				CloseTcpConnection(msg);
 			}
@@ -441,8 +437,9 @@ namespace EventStore.ClientAPI.Internal {
 		private void StartOperation(IClientOperation operation, int maxRetries, TimeSpan timeout) {
 			switch (_state) {
 				case ConnectionState.Init:
-					operation.Fail(new InvalidOperationException(
-						string.Format("EventStoreConnection '{0}' is not active.", _esConnection.ConnectionName)));
+					operation.Fail(
+						new InvalidOperationException(
+							$"EventStoreConnection '{_esConnection.ConnectionName}' is not active."));
 					break;
 				case ConnectionState.Connecting:
 					LogDebug("StartOperation enqueue {0}, {1}, {2}, {3}.", operation.GetType().Name, operation,
@@ -458,7 +455,7 @@ namespace EventStore.ClientAPI.Internal {
 					operation.Fail(new ObjectDisposedException(_esConnection.ConnectionName));
 					break;
 				default:
-					throw new Exception(string.Format("Unknown state: {0}.", _state));
+					throw new Exception($"Unknown state: {_state}.");
 			}
 		}
 
@@ -466,7 +463,7 @@ namespace EventStore.ClientAPI.Internal {
 			switch (_state) {
 				case ConnectionState.Init:
 					msg.Source.SetException(new InvalidOperationException(
-						string.Format("EventStoreConnection '{0}' is not active.", _esConnection.ConnectionName)));
+						$"EventStoreConnection '{_esConnection.ConnectionName}' is not active."));
 					break;
 				case ConnectionState.Connecting:
 				case ConnectionState.Connected:
@@ -486,7 +483,7 @@ namespace EventStore.ClientAPI.Internal {
 					msg.Source.SetException(new ObjectDisposedException(_esConnection.ConnectionName));
 					break;
 				default:
-					throw new Exception(string.Format("Unknown state: {0}.", _state));
+					throw new Exception($"Unknown state: {_state}.");
 			}
 		}
 
@@ -494,7 +491,7 @@ namespace EventStore.ClientAPI.Internal {
 			switch (_state) {
 				case ConnectionState.Init:
 					msg.Source.SetException(new InvalidOperationException(
-						string.Format("EventStoreConnection '{0}' is not active.", _esConnection.ConnectionName)));
+						$"EventStoreConnection '{_esConnection.ConnectionName}' is not active."));
 					break;
 				case ConnectionState.Connecting:
 				case ConnectionState.Connected:
@@ -513,7 +510,7 @@ namespace EventStore.ClientAPI.Internal {
 				case ConnectionState.Closed:
 					msg.Source.SetException(new ObjectDisposedException(_esConnection.ConnectionName));
 					break;
-				default: throw new Exception(string.Format("Unknown state: {0}.", _state));
+				default: throw new Exception($"Unknown state: {_state}.");
 			}
 		}
 
@@ -521,7 +518,7 @@ namespace EventStore.ClientAPI.Internal {
 			switch (_state) {
 				case ConnectionState.Init:
 					msg.Source.SetException(new InvalidOperationException(
-						string.Format("EventStoreConnection '{0}' is not active.", _esConnection.ConnectionName)));
+						$"EventStoreConnection '{_esConnection.ConnectionName}' is not active."));
 					break;
 				case ConnectionState.Connecting:
 				case ConnectionState.Connected:
@@ -541,7 +538,7 @@ namespace EventStore.ClientAPI.Internal {
 					msg.Source.SetException(new ObjectDisposedException(_esConnection.ConnectionName));
 					break;
 				default:
-					throw new Exception(string.Format("Unknown state: {0}.", _state));
+					throw new Exception($"Unknown state: {_state}.");
 			}
 		}
 
@@ -588,15 +585,12 @@ namespace EventStore.ClientAPI.Internal {
 				string message = Helper.EatException(() =>
 					Helper.UTF8NoBom.GetString(package.Data.Array, package.Data.Offset, package.Data.Count));
 				var exc = new EventStoreConnectionException(
-					string.Format("Bad request received from server. Error: {0}",
-						string.IsNullOrEmpty(message) ? "<no message>" : message));
+					$"Bad request received from server. Error: {(string.IsNullOrEmpty(message) ? "<no message>" : message)}");
 				CloseConnection("Connection-wide BadRequest received. Too dangerous to continue.", exc);
 				return;
 			}
 
-			OperationItem operation;
-			SubscriptionItem subscription;
-			if (_operations.TryGetActiveOperation(package.CorrelationId, out operation)) {
+			if (_operations.TryGetActiveOperation(package.CorrelationId, out var operation)) {
 				var result = operation.Operation.InspectPackage(package);
 				LogDebug("HandleTcpPackage OPERATION DECISION {0} ({1}), {2}", result.Decision, result.Description,
 					operation);
@@ -619,12 +613,12 @@ namespace EventStore.ClientAPI.Internal {
 						_operations.RemoveOperation(operation);
 						break;
 					default:
-						throw new Exception(string.Format("Unknown InspectionDecision: {0}", result.Decision));
+						throw new Exception($"Unknown InspectionDecision: {result.Decision}");
 				}
 
 				if (_state == ConnectionState.Connected)
 					_operations.TryScheduleWaitingOperations(connection);
-			} else if (_subscriptions.TryGetActiveSubscription(package.CorrelationId, out subscription)) {
+			} else if (_subscriptions.TryGetActiveSubscription(package.CorrelationId, out var subscription)) {
 				var result = subscription.Operation.InspectPackage(package);
 				LogDebug("HandleTcpPackage SUBSCRIPTION DECISION {0} ({1}), {2}", result.Decision, result.Description,
 					subscription);
@@ -645,7 +639,7 @@ namespace EventStore.ClientAPI.Internal {
 						subscription.IsSubscribed = true;
 						break;
 					default:
-						throw new Exception(string.Format("Unknown InspectionDecision: {0}", result.Decision));
+						throw new Exception($"Unknown InspectionDecision: {result.Decision}");
 				}
 			} else {
 				LogDebug("HandleTcpPackage UNMAPPED PACKAGE with CorrelationId {0:B}, Command: {1}",
@@ -665,9 +659,8 @@ namespace EventStore.ClientAPI.Internal {
 			if (_state != ConnectionState.Connected || _connection.RemoteEndPoint.Equals(endPoint))
 				return;
 
-			var msg = string.Format(
-				"EventStoreConnection '{0}': going to reconnect to [{1}]. Current endpoint: [{2}, L{3}].",
-				_esConnection.ConnectionName, endPoint, _connection.RemoteEndPoint, _connection.LocalEndPoint);
+			var msg =
+				$"EventStoreConnection '{_esConnection.ConnectionName}': going to reconnect to [{endPoint}]. Current endpoint: [{_connection.RemoteEndPoint}, L{_connection.LocalEndPoint}].";
 			if (_settings.VerboseLogging)
 				_settings.Log.Info(msg);
 			CloseTcpConnection(msg);
@@ -720,7 +713,7 @@ namespace EventStore.ClientAPI.Internal {
 		public event EventHandler<ClientErrorEventArgs> ErrorOccurred = delegate { };
 		public event EventHandler<ClientAuthenticationFailedEventArgs> AuthenticationFailed = delegate { };
 
-		private struct HeartbeatInfo {
+		private readonly struct HeartbeatInfo {
 			public readonly int LastPackageNumber;
 			public readonly bool IsIntervalStage;
 			public readonly TimeSpan TimeStamp;
@@ -732,7 +725,7 @@ namespace EventStore.ClientAPI.Internal {
 			}
 		}
 
-		private struct ReconnectionInfo {
+		private readonly struct ReconnectionInfo {
 			public readonly int ReconnectionAttempt;
 			public readonly TimeSpan TimeStamp;
 
@@ -742,7 +735,7 @@ namespace EventStore.ClientAPI.Internal {
 			}
 		}
 
-		private struct AuthInfo {
+		private readonly struct AuthInfo {
 			public readonly Guid CorrelationId;
 			public readonly TimeSpan TimeStamp;
 			public readonly int Retries;
@@ -754,7 +747,7 @@ namespace EventStore.ClientAPI.Internal {
 			}
 		}
 
-		private struct IdentifyInfo {
+		private readonly struct IdentifyInfo {
 			public readonly Guid CorrelationId;
 			public readonly TimeSpan TimeStamp;
 

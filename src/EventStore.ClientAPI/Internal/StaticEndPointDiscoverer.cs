@@ -8,11 +8,9 @@ namespace EventStore.ClientAPI.Internal {
 
 		public StaticEndPointDiscoverer(EndPoint endPoint, bool isSsl) {
 			Ensure.NotNull(endPoint, "endPoint");
-			_task = Task.Factory.StartNew(() => new NodeEndPoints(isSsl ? null : endPoint, isSsl ? endPoint : null));
+			_task = Task.FromResult(new NodeEndPoints(isSsl ? null : endPoint, isSsl ? endPoint : null));
 		}
 
-		public Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) {
-			return _task;
-		}
+		public Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) => _task;
 	}
 }

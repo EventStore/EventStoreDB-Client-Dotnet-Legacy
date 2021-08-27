@@ -8,7 +8,7 @@ using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Messages;
 using EventStore.ClientAPI.Transport.Http;
 using System.Linq;
-using System.Net.Http;
+using EventStore.ClientAPI.Common.Utils.Threading;
 using HttpStatusCode = EventStore.ClientAPI.Transport.Http.HttpStatusCode;
 
 namespace EventStore.ClientAPI.Internal {
@@ -48,44 +48,42 @@ namespace EventStore.ClientAPI.Internal {
 			_nodePreference = nodePreference;
 		}
 
-		public Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) {
-			return Task.Factory.StartNew(() => {
-				var maxDiscoverAttemptsStr = "";
-				if (_maxDiscoverAttempts != Int32.MaxValue)
-					maxDiscoverAttemptsStr = "/" + _maxDiscoverAttempts;
+		public async Task<NodeEndPoints> DiscoverAsync(EndPoint failedTcpEndPoint) {
+			var maxDiscoverAttemptsStr = "";
+			if (_maxDiscoverAttempts != int.MaxValue)
+				maxDiscoverAttemptsStr = "/" + _maxDiscoverAttempts;
 
-				for (int attempt = 1; attempt <= _maxDiscoverAttempts; ++attempt) {
-					//_log.Info("Discovering cluster. Attempt {0}/{1}...", attempt, _maxDiscoverAttempts);
-					try {
-						var endPoints = DiscoverEndPoint(failedTcpEndPoint);
-						if (endPoints != null) {
-							_log.Info("Discovering attempt {0}{1} successful: best candidate is {2}.", attempt,
-								maxDiscoverAttemptsStr, endPoints);
-							return endPoints.Value;
-						}
-
-						_log.Info("Discovering attempt {0}{1} failed: no candidate found.", attempt,
-							maxDiscoverAttemptsStr);
-					} catch (Exception exc) {
-						_log.Info("Discovering attempt {0}{1} failed with error: {2}.", attempt, maxDiscoverAttemptsStr,
-							exc);
+			for (int attempt = 1; attempt <= _maxDiscoverAttempts; ++attempt) {
+				_log.Info("Discovering cluster. Attempt {0}/{1}...", attempt, _maxDiscoverAttempts);
+				try {
+					var endPoints = await DiscoverEndPointAsync(failedTcpEndPoint).ConfigureAwait(false);
+					if (endPoints != null) {
+						_log.Info("Discovering attempt {0}{1} successful: best candidate is {2}.", attempt,
+							maxDiscoverAttemptsStr, endPoints);
+						return endPoints.Value;
 					}
 
-					Thread.Sleep(500);
+					_log.Info("Discovering attempt {0}{1} failed: no candidate found.", attempt,
+						maxDiscoverAttemptsStr);
+				} catch (Exception exc) {
+					_log.Info("Discovering attempt {0}{1} failed with error: {2}.", attempt, maxDiscoverAttemptsStr,
+						exc);
 				}
 
-				throw new ClusterException($"Failed to discover candidate in {_maxDiscoverAttempts} attempts.");
-			});
+				await Task.Delay(500).ConfigureAwait(false);
+			}
+
+			throw new ClusterException($"Failed to discover candidate in {_maxDiscoverAttempts} attempts.");
 		}
 
-		private NodeEndPoints? DiscoverEndPoint(EndPoint failedEndPoint) {
+		private async Task<NodeEndPoints?> DiscoverEndPointAsync(EndPoint failedEndPoint) {
 			var oldGossip = Interlocked.Exchange(ref _oldGossip, null);
 			var gossipCandidates = oldGossip != null
 				? GetGossipCandidatesFromOldGossip(oldGossip.Item1, oldGossip.Item2, failedEndPoint)
 				: GetGossipCandidatesFromConfig();
 			for (int i = 0; i < gossipCandidates.Length; ++i) {
-				var gossip = TryGetGossipFrom(gossipCandidates[i]);
-				if (gossip == null || gossip.Members == null || gossip.Members.Length == 0)
+				var gossip = await TryGetGossipFromAsync(gossipCandidates[i]).ConfigureAwait(false);
+				if (gossip?.Members == null || gossip.Members.Length == 0)
 					continue;
 
 				var bestNode = TryDetermineBestNode(gossip.Members, _nodePreference);
@@ -181,11 +179,10 @@ namespace EventStore.ClientAPI.Internal {
 			}
 		}
 
-		private ClusterMessages.ClusterInfoDto TryGetGossipFrom(GossipSeed endPoint) {
+		private Task<ClusterMessages.ClusterInfoDto> TryGetGossipFromAsync(GossipSeed endPoint) {
 			//_log.Debug("ClusterDnsEndPointDiscoverer: Trying to get gossip from [{0}].", endPoint);
 
-			ClusterMessages.ClusterInfoDto result = null;
-			var completed = new ManualResetEventSlim(false);
+			var completedSource = TaskCompletionSourceFactory.Create<ClusterMessages.ClusterInfoDto>();
 
 			var url = endPoint.EndPoint.ToHttpUrl(
 				endPoint.SeedOverTls ? EndpointExtensions.HTTPS_SCHEMA : EndpointExtensions.HTTP_SCHEMA,
@@ -202,7 +199,7 @@ namespace EventStore.ClientAPI.Internal {
 						}
 
 						try {
-							result = response.Body.ParseJson<ClusterMessages.ClusterInfoDto>();
+							completedSource.TrySetResult(response.Body.ParseJson<ClusterMessages.ClusterInfoDto>());
 							//_log.Debug("ClusterDnsEndPointDiscoverer: Got gossip from [{0}]:\n{1}.", endPoint, string.Join("\n", result.Members.Select(x => x.ToString())));
 						} catch (Exception e) {
 							if (e is AggregateException ae)
@@ -210,7 +207,7 @@ namespace EventStore.ClientAPI.Internal {
 							_log.Error("Failed to get cluster info from [{0}]: deserialization error: {1}.", endPoint.EndPoint, e);
 						}
 					} finally {
-						completed.Set();
+						completedSource.TrySetResult(null);
 					}
 				},
 				e => {
@@ -219,13 +216,13 @@ namespace EventStore.ClientAPI.Internal {
 							e = ae.Flatten();
 						_log.Error("Failed to get cluster info from [{0}]: request failed, error: {1}.", endPoint.EndPoint, e);
 					} finally {
-						completed.Set();
+						completedSource.TrySetResult(null);
 					}
 				},
 				// https://github.com/EventStore/EventStore/pull/2744#pullrequestreview-562358658
 				endPoint.V5HostHeader ? "" : endPoint.EndPoint.GetHost());
-			completed.Wait(_gossipTimeout);
-			return result;
+			Task.Delay(_gossipTimeout).ContinueWith(_ => completedSource.TrySetResult(null));
+			return completedSource.Task;
 		}
 
 		private NodeEndPoints? TryDetermineBestNode(IEnumerable<ClusterMessages.MemberInfoDto> members,
@@ -291,9 +288,7 @@ namespace EventStore.ClientAPI.Internal {
 			return new NodeEndPoints(normTcp, secTcp);
 		}
 
-		private bool IsReadOnlyReplicaState(ClusterMessages.VNodeState state) {
-			return state == ClusterMessages.VNodeState.ReadOnlyLeaderless
-				   || state == ClusterMessages.VNodeState.ReadOnlyReplica;
-		}
+		private bool IsReadOnlyReplicaState(ClusterMessages.VNodeState state) =>
+			state is ClusterMessages.VNodeState.ReadOnlyLeaderless or ClusterMessages.VNodeState.ReadOnlyReplica;
 	}
 }

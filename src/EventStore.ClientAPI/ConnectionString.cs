@@ -69,24 +69,17 @@ namespace EventStore.ClientAPI {
 							return new UserCredentials(pieces[0], pieces[1]);
 						} catch (Exception ex) {
 							throw new Exception(
-								string.Format(
-									"User credentials {0} is not in correct format. Expected format is username:password.",
-									x), ex);
+								$"User credentials {x} is not in correct format. Expected format is username:password.", ex);
 						}
 					}
 				},
 				{
-					typeof(HttpMessageHandler), x => {
-						#if NET452
-							throw new Exception("Setting the Http Message Handler via connection string is not supported in .NET 4.5.2");
-						#else
-							if (x.Trim().Equals("SkipCertificateValidation")) {
-								return new HttpClientHandler {
-									ServerCertificateCustomValidationCallback = delegate { return true; }
-								};
-							}
-							throw new Exception("The only supported value for Http Message Handler is: SkipCertificateValidation");
-						#endif
+					typeof(HttpMessageHandler), x => x.Trim() switch {
+						"SkipCertificateValidation" => new HttpClientHandler {
+							ServerCertificateCustomValidationCallback = delegate { return true; }
+						},
+						_ => throw new Exception(
+							"The only supported value for Http Message Handler is: SkipCertificateValidation")
 					}
 				}
 			};
