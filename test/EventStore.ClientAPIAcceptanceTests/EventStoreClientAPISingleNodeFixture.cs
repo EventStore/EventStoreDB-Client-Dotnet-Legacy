@@ -29,6 +29,7 @@ namespace EventStore.ClientAPI {
 			_eventStore = new Builder()
 				.UseContainer()
 				.UseImage($"docker.pkg.github.com/eventstore/eventstore/eventstore:{GlobalEnvironment.ImageTag}")
+				.WithName("es-client-dotnet-legacy-test")
 				.WithEnvironment(
 					"EVENTSTORE_DB_LOG_FORMAT=" + GlobalEnvironment.DbLogFormat,
 					"EVENTSTORE_MEM_DB=true",

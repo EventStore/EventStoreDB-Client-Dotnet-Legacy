@@ -194,17 +194,10 @@ namespace EventStore.ClientAPI {
 			Ensure.NotNull(clusterSettings, "clusterSettings");
 
 			var handler = connectionSettings.CustomHttpMessageHandler;
-			if (handler is null) {
-				if (!connectionSettings.ValidateServer) {
-#if NET452
-					connectionSettings.Log.Info(
-						"Setting the Http Message Handler via connection settings is not supported in .NET 4.5.2");
-#else
-					handler = new HttpClientHandler {
-						ServerCertificateCustomValidationCallback = delegate { return true; }
-					};
-#endif
-				}
+			if (handler is null && !connectionSettings.ValidateServer) {
+				handler = new HttpClientHandler {
+					ServerCertificateCustomValidationCallback = delegate { return true; }
+				};
 			}
 
 			var discoverClient = new HttpAsyncClient(connectionSettings.GossipTimeout, handler);

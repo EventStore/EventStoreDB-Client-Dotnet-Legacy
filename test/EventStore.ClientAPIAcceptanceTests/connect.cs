@@ -134,35 +134,46 @@ namespace EventStore.ClientAPI {
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 		}
 
+#if NETCOREAPP3_1
+		[Fact(Skip = "Skip on netcoreapp3.1 due to test instability")]
+#else
 		[Fact]
+#endif
+
 		public async Task can_reconnect_and_retry() {
 			var streamName = GetStreamName();
+			var disconnectedSource = new TaskCompletionSource<bool>();
 			using var connection = _fixture.CreateConnection(
 				builder => builder.UseSsl(true)
 					.DisableServerCertificateValidation()
 					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
-					.SetReconnectionDelayTo(TimeSpan.Zero)
+					.SetReconnectionDelayTo(TimeSpan.FromMilliseconds(20))
 					.KeepReconnecting()
 					.KeepRetrying()
 					.FailOnNoServerResponse(),
 				useStandardPort: true,
 				clusterMaxDiscoverAttempts: -1);
+
+			connection.Disconnected += (_, _) => disconnectedSource.TrySetResult(true);
+
 			await connection.ConnectAsync().WithTimeout();
 
 			// can definitely write without throwing
-			await WriteAnEventAsync();
+			await WriteAnEventAsync().WithTimeout();
 
 			_fixture.EventStore.Stop();
 
+			await disconnectedSource.Task.WithTimeout(TimeSpan.FromMinutes(1));
+
 			var writeTask = WriteAnEventAsync();
 
-			// writeTask cannot complete because ES is stopped
-			await Assert.ThrowsAnyAsync<Exception>(() => writeTask.WithTimeout());
+			// writeTask continuation cannot complete and will timeout because ES is stopped
+			await Assert.ThrowsAsync<TimeoutException>(() => writeTask.WithTimeout());
 
 			_fixture.EventStore.Start();
 
 			// same writeTask can complete now by reconnecting and retrying
-			var writeResult = await writeTask.WithTimeout();
+			var writeResult = await writeTask.WithTimeout(TimeSpan.FromMilliseconds(100 * 1000));
 
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 
