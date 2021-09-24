@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest]
         test: [""]
         configuration: [release]
-        docker-tag: ['ci']
+        docker-tag: ['21.2.1-alpha.0.157-alpine']
     runs-on: ${{ matrix.os }}
     name: build-${{ matrix.os }}/${{ matrix.framework }}/EventStore.ClientAPI${{ matrix.test }}
     steps:
