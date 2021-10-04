@@ -13,41 +13,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.ClientAPI.Tests"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|Any CPU.Build.0 = Debug|x64
 		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|x64.ActiveCfg = Debug|x64
 		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|x64.Build.0 = Debug|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|x86.ActiveCfg = Debug|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|x86.Build.0 = Debug|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|Any CPU.ActiveCfg = Release|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|Any CPU.Build.0 = Release|x64
 		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|x64.ActiveCfg = Release|x64
 		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|x64.Build.0 = Release|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|x86.ActiveCfg = Release|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|x86.Build.0 = Release|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|Any CPU.Build.0 = Debug|x64
 		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|x64.ActiveCfg = Debug|x64
 		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|x64.Build.0 = Debug|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|x86.ActiveCfg = Debug|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|x86.Build.0 = Debug|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|Any CPU.ActiveCfg = Release|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|Any CPU.Build.0 = Release|x64
 		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|x64.ActiveCfg = Release|x64
 		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|x64.Build.0 = Release|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|x86.ActiveCfg = Release|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0498C972-2B97-4571-A5CA-D4BE66E5BA17} = {AE3B6255-328F-44EC-AE65-3C7B9C70DE52}

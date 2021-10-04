@@ -11,10 +11,6 @@
 		<DebugType Condition=" '$(Configuration)' == 'Debug' ">full</DebugType>
 		<DebugType Condition=" '$(Configuration)' == 'Release' ">pdbonly</DebugType>
 	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="NETStandard.Library" Version="2.0.3"/>
-		<PackageReference Include="System.Net.Http" Version="4.3.4"/>
-	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
 		<PackageReference Include="IndexRange" Version="1.0.0" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
