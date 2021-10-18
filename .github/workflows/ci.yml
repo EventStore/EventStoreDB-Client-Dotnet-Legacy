@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest]
         test: [""]
         configuration: [release]
-        docker-tag: ['21.2.1-alpha.0.157-alpine']
+        docker-tag: ['ci']
     runs-on: ${{ matrix.os }}
     name: build-${{ matrix.os }}/${{ matrix.framework }}/EventStore.ClientAPI${{ matrix.test }}
     steps:
@@ -115,11 +115,11 @@ jobs:
       with:
         path: packages
         name: nuget-packages
-    # - name: Dotnet Push to Github Packages
-    #   if: github.event_name == 'push'
-    #   run: |
-    #     dotnet tool restore
-    #     find . -name "*.nupkg" | xargs -n1 dotnet tool run gpr -- push --api-key=${{ secrets.github_token }}
+    - name: Dotnet Push to Github Packages
+      if: github.event_name == 'push'
+      run: |
+        dotnet tool restore
+        find . -name "*.nupkg" | xargs -n1 dotnet tool run gpr -- push --api-key=${{ secrets.github_token }}
     - name: Dotnet Push to Nuget.org
       if: github.event_name == 'push' && startsWith(steps.get_version.outputs.branch, 'refs/tags/v')
       run: |
