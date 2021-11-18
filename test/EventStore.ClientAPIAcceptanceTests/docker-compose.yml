@@ -27,7 +27,7 @@ services:
     depends_on:
       - volumes-provisioner
   esdb-node1:
-    image: ghcr.io/eventstore/eventstore:${ES_DOCKER_TAG}
+    image: ${ES_DOCKER_IMAGE}:${ES_DOCKER_TAG}
     env_file:
       - shared.env
     environment:
@@ -52,7 +52,7 @@ services:
       - cert-gen
 
   esdb-node2:
-    image: ghcr.io/eventstore/eventstore:${ES_DOCKER_TAG}
+    image: ${ES_DOCKER_IMAGE}:${ES_DOCKER_TAG}
     env_file:
       - shared.env
     environment:
@@ -77,7 +77,7 @@ services:
       - cert-gen
 
   esdb-node3:
-    image: ghcr.io/eventstore/eventstore:${ES_DOCKER_TAG}
+    image: ${ES_DOCKER_IMAGE}:${ES_DOCKER_TAG}
     env_file:
       - shared.env
     environment:
@@ -102,7 +102,7 @@ services:
       - cert-gen
 
   esdb-node4:
-    image: ghcr.io/eventstore/eventstore:${ES_DOCKER_TAG}
+    image: ${ES_DOCKER_IMAGE}:${ES_DOCKER_TAG}
     env_file:
       - shared.env
     environment:

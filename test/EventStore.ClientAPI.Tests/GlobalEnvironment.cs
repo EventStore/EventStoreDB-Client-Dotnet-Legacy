@@ -11,10 +11,12 @@ namespace EventStore.ClientAPI {
 
 		public static bool UseCluster { get; } = false;
 
+		public static string Image => GetEnvironmentVariable(ImageName, ImageDefault);
 		public static string ImageTag => GetEnvironmentVariable(ImageTagName, ImageTagDefault);
 		public static string DbLogFormat => GetEnvironmentVariable(DbLogFormatName, DbLogFormatDefault);
 
 		public static string[] EnvironmentVariables => new[] {
+			$"{ImageName}={Image}",
 			$"{ImageTagName}={ImageTag}",
 			$"{DbLogFormatName}={DbLogFormat}",
 		};
@@ -23,6 +25,8 @@ namespace EventStore.ClientAPI {
 		public static bool IsLogV3 => string.Equals(DbLogFormat, "experimentalV3", StringComparison.OrdinalIgnoreCase);
 
 		static string UseClusterName => "ES_USE_CLUSTER";
+		static string ImageName => "ES_DOCKER_IMAGE";
+		static string ImageDefault => "ghcr.io/eventstore/eventstore"; // old: "docker.pkg.github.com/eventstore/eventstore/eventstore"
 		static string ImageTagName => "ES_DOCKER_TAG";
 		static string ImageTagDefault => "ci"; // e.g. "21.6.0-focal";
 		static string DbLogFormatName => "EVENTSTORE_DB_LOG_FORMAT";
