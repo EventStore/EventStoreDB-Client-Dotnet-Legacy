@@ -236,6 +236,7 @@ namespace EventStore.ClientAPI.Internal {
 				ClusterMessages.VNodeState.Initializing,
 				ClusterMessages.VNodeState.CatchingUp,
 				ClusterMessages.VNodeState.ShuttingDown,
+				ClusterMessages.VNodeState.DiscoverLeader,
 				ClusterMessages.VNodeState.PreLeader,
 				ClusterMessages.VNodeState.PreReplica,
 				ClusterMessages.VNodeState.PreReadOnlyReplica,
