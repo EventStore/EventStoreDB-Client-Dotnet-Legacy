@@ -28,7 +28,7 @@ namespace EventStore.ClientAPI {
 			// might be useful to make memdb configurable too
 			_eventStore = new Builder()
 				.UseContainer()
-				.UseImage($"ghcr.io/eventstore/eventstore:{GlobalEnvironment.ImageTag}")
+				.UseImage($"{GlobalEnvironment.Image}:{GlobalEnvironment.ImageTag}")
 				.WithName("es-client-dotnet-legacy-test")
 				.WithEnvironment(
 					"EVENTSTORE_DB_LOG_FORMAT=" + GlobalEnvironment.DbLogFormat,
