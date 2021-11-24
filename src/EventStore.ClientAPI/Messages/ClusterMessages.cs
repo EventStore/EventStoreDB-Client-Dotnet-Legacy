@@ -90,6 +90,7 @@ namespace EventStore.ClientAPI.Messages {
 			Manager = 16,
 			ShuttingDown = 17,
 			Shutdown = 18,
+			ResigningLeader = 19,
 		}
 	}
 }
