@@ -230,17 +230,16 @@ namespace EventStore.ClientAPI.Internal {
 			var notAllowedStates = new[] {
 				ClusterMessages.VNodeState.Manager,
 				ClusterMessages.VNodeState.ShuttingDown,
-				ClusterMessages.VNodeState.Manager,
 				ClusterMessages.VNodeState.Shutdown,
 				ClusterMessages.VNodeState.Unknown,
 				ClusterMessages.VNodeState.Initializing,
 				ClusterMessages.VNodeState.CatchingUp,
-				ClusterMessages.VNodeState.ShuttingDown,
 				ClusterMessages.VNodeState.DiscoverLeader,
 				ClusterMessages.VNodeState.PreLeader,
 				ClusterMessages.VNodeState.PreReplica,
 				ClusterMessages.VNodeState.PreReadOnlyReplica,
-				ClusterMessages.VNodeState.Clone
+				ClusterMessages.VNodeState.Clone,
+				ClusterMessages.VNodeState.ResigningLeader,
 			};
 
 			var nodes = members.Where(x => x.IsAlive)
