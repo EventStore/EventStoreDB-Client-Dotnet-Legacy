@@ -1,0 +1,43 @@
+version: "3.5"
+
+services:
+    tcp.client:
+        build: ./
+        environment:
+            # URL should match the DNS name in certificate and container name
+            - ESDB_CONNECTION_STRING=ConnectTo=tcp://eventstoredb:1113;DefaultCredentials=admin:changeit
+        networks:
+            - esdb_network
+        depends_on:
+            eventstoredb:
+                condition: service_healthy
+
+    eventstoredb:
+        image: eventstore/eventstore:21.10.1-buster-slim
+        # container_name should match the DNS name in certificate
+        container_name: eventstoredb
+        environment:
+            - EVENTSTORE_CLUSTER_SIZE=1
+            - EVENTSTORE_RUN_PROJECTIONS=All
+            - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+            - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+            - EVENTSTORE_EXT_TCP_PORT=1113
+            - EVENTSTORE_HTTP_PORT=2113
+            # set certificates location
+            - EVENTSTORE_CERTIFICATE_FILE=/etc/eventstore/certs/node/node.crt
+            - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/eventstore/certs/node/node.key
+            - EVENTSTORE_TRUSTED_ROOT_CERTIFICATES_PATH=/etc/eventstore/certs/ca
+        ports:
+            - 1113:1113
+            - 2113:2113
+        networks:
+            - esdb_network
+        volumes:
+            # define volume that will copy pregenerated certificates
+            - ./certs:/etc/eventstore/certs
+        restart: unless-stopped
+
+networks:
+    esdb_network:
+        name: eventstoredb.local
+        driver: bridge

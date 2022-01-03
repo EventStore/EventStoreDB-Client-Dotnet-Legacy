@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "secure-with-tls", "secure-with-tls.csproj", "{391D12DD-EF05-4E98-97ED-D303F3713155}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.ClientAPI", "..\..\src\EventStore.ClientAPI\EventStore.ClientAPI.csproj", "{C583AB70-08F1-46A0-BA03-AC1F07CD87DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{391D12DD-EF05-4E98-97ED-D303F3713155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{391D12DD-EF05-4E98-97ED-D303F3713155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{391D12DD-EF05-4E98-97ED-D303F3713155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{391D12DD-EF05-4E98-97ED-D303F3713155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C583AB70-08F1-46A0-BA03-AC1F07CD87DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C583AB70-08F1-46A0-BA03-AC1F07CD87DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C583AB70-08F1-46A0-BA03-AC1F07CD87DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C583AB70-08F1-46A0-BA03-AC1F07CD87DD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
