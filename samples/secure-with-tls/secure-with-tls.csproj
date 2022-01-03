@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>secure_with_tls</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+			<!-- Use NuGet instead of ProjectReferences -->
+			<!-- <PackageReference Include="EventStore.Client" Version="21.2.2" /> -->
+			<ProjectReference Include="..\..\src\EventStore.ClientAPI\EventStore.ClientAPI.csproj" />
+    </ItemGroup>
+</Project>
