@@ -5,32 +5,35 @@ VisualStudioVersion = 16.6.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AE3B6255-328F-44EC-AE65-3C7B9C70DE52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.ClientAPI", "src\EventStore.ClientAPI\EventStore.ClientAPI.csproj", "{0498C972-2B97-4571-A5CA-D4BE66E5BA17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStore.ClientAPI", "src\EventStore.ClientAPI\EventStore.ClientAPI.csproj", "{0498C972-2B97-4571-A5CA-D4BE66E5BA17}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F937B1F1-67B8-43F9-A50A-302B9B1E209B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStore.ClientAPI.Tests", "test\EventStore.ClientAPI.Tests\EventStore.ClientAPI.Tests.csproj", "{EB0FBD96-3674-44E7-B490-6958AB0696B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStore.ClientAPI.Tests", "test\EventStore.ClientAPI.Tests\EventStore.ClientAPI.Tests.csproj", "{EB0FBD96-3674-44E7-B490-6958AB0696B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Release|x64 = Release|x64
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|x64.ActiveCfg = Debug|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Debug|x64.Build.0 = Debug|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|x64.ActiveCfg = Release|x64
-		{0498C972-2B97-4571-A5CA-D4BE66E5BA17}.Release|x64.Build.0 = Release|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|x64.ActiveCfg = Debug|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Debug|x64.Build.0 = Debug|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|x64.ActiveCfg = Release|x64
-		{EB0FBD96-3674-44E7-B490-6958AB0696B9}.Release|x64.Build.0 = Release|x64
-	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0498C972-2B97-4571-A5CA-D4BE66E5BA17} = {AE3B6255-328F-44EC-AE65-3C7B9C70DE52}
 		{EB0FBD96-3674-44E7-B490-6958AB0696B9} = {F937B1F1-67B8-43F9-A50A-302B9B1E209B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B533D766-2BC3-4E4C-9300-519B7F07FD97}
 	EndGlobalSection
 EndGlobal
