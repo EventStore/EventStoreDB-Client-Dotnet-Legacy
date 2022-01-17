@@ -1,7 +1,6 @@
 <Project>
 	<PropertyGroup>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-		<Platform>x64</Platform>
 		<TargetFrameworks>netcoreapp3.1;net48;net5.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<RootNamespace>EventStore.ClientAPI</RootNamespace>

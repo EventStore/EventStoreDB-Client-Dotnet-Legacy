@@ -13,7 +13,7 @@ using Xunit;
 namespace EventStore.ClientAPI {
 	public partial class EventStoreClientAPISingleNodeFixture : IAsyncLifetime {
 		private static readonly string HostCertificatePath =
-			Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "..", "..", "..", "certs"));
+			Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "..", "..", "certs"));
 
 		private readonly IContainerService _eventStore;
 
