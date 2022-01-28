@@ -447,22 +447,22 @@ namespace EventStore.ClientAPI.Messages
     public enum ReadEventResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"NotFound", Value=1)]
+      [ProtoEnum(Name=@"NotFound")]
       NotFound = 1,
             
-      [ProtoEnum(Name=@"NoStream", Value=2)]
+      [ProtoEnum(Name=@"NoStream")]
       NoStream = 2,
             
-      [ProtoEnum(Name=@"StreamDeleted", Value=3)]
+      [ProtoEnum(Name=@"StreamDeleted")]
       StreamDeleted = 3,
             
-      [ProtoEnum(Name=@"Error", Value=4)]
+      [ProtoEnum(Name=@"Error")]
       Error = 4,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=5)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 5
     }
   
@@ -534,22 +534,22 @@ namespace EventStore.ClientAPI.Messages
     public enum ReadStreamResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"NoStream", Value=1)]
+      [ProtoEnum(Name=@"NoStream")]
       NoStream = 1,
             
-      [ProtoEnum(Name=@"StreamDeleted", Value=2)]
+      [ProtoEnum(Name=@"StreamDeleted")]
       StreamDeleted = 2,
             
-      [ProtoEnum(Name=@"NotModified", Value=3)]
+      [ProtoEnum(Name=@"NotModified")]
       NotModified = 3,
             
-      [ProtoEnum(Name=@"Error", Value=4)]
+      [ProtoEnum(Name=@"Error")]
       Error = 4,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=5)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 5
     }
   
@@ -625,16 +625,16 @@ namespace EventStore.ClientAPI.Messages
     public enum ReadAllResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"NotModified", Value=1)]
+      [ProtoEnum(Name=@"NotModified")]
       NotModified = 1,
             
-      [ProtoEnum(Name=@"Error", Value=2)]
+      [ProtoEnum(Name=@"Error")]
       Error = 2,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=3)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 3
     }
   
@@ -668,10 +668,10 @@ namespace EventStore.ClientAPI.Messages
     public enum FilterContext
     {
             
-      [ProtoEnum(Name=@"StreamId", Value=0)]
+      [ProtoEnum(Name=@"StreamId")]
       StreamId = 0,
             
-      [ProtoEnum(Name=@"EventType", Value=1)]
+      [ProtoEnum(Name=@"EventType")]
       EventType = 1
     }
   
@@ -679,10 +679,10 @@ namespace EventStore.ClientAPI.Messages
     public enum FilterType
     {
             
-      [ProtoEnum(Name=@"Regex", Value=0)]
+      [ProtoEnum(Name=@"Regex")]
       Regex = 0,
             
-      [ProtoEnum(Name=@"Prefix", Value=1)]
+      [ProtoEnum(Name=@"Prefix")]
       Prefix = 1
     }
   
@@ -765,16 +765,16 @@ namespace EventStore.ClientAPI.Messages
     public enum FilteredReadAllResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"NotModified", Value=1)]
+      [ProtoEnum(Name=@"NotModified")]
       NotModified = 1,
             
-      [ProtoEnum(Name=@"Error", Value=2)]
+      [ProtoEnum(Name=@"Error")]
       Error = 2,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=3)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 3
     }
   
@@ -972,16 +972,16 @@ namespace EventStore.ClientAPI.Messages
     public enum UpdatePersistentSubscriptionResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"DoesNotExist", Value=1)]
+      [ProtoEnum(Name=@"DoesNotExist")]
       DoesNotExist = 1,
             
-      [ProtoEnum(Name=@"Fail", Value=2)]
+      [ProtoEnum(Name=@"Fail")]
       Fail = 2,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=3)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 3
     }
   
@@ -1007,16 +1007,16 @@ namespace EventStore.ClientAPI.Messages
     public enum CreatePersistentSubscriptionResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"AlreadyExists", Value=1)]
+      [ProtoEnum(Name=@"AlreadyExists")]
       AlreadyExists = 1,
             
-      [ProtoEnum(Name=@"Fail", Value=2)]
+      [ProtoEnum(Name=@"Fail")]
       Fail = 2,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=3)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 3
     }
   
@@ -1042,16 +1042,16 @@ namespace EventStore.ClientAPI.Messages
     public enum DeletePersistentSubscriptionResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"DoesNotExist", Value=1)]
+      [ProtoEnum(Name=@"DoesNotExist")]
       DoesNotExist = 1,
             
-      [ProtoEnum(Name=@"Fail", Value=2)]
+      [ProtoEnum(Name=@"Fail")]
       Fail = 2,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=3)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 3
     }
   
@@ -1123,19 +1123,19 @@ namespace EventStore.ClientAPI.Messages
     public enum NakAction
     {
             
-      [ProtoEnum(Name=@"Unknown", Value=0)]
+      [ProtoEnum(Name=@"Unknown")]
       Unknown = 0,
             
-      [ProtoEnum(Name=@"Park", Value=1)]
+      [ProtoEnum(Name=@"Park")]
       Park = 1,
             
-      [ProtoEnum(Name=@"Retry", Value=2)]
+      [ProtoEnum(Name=@"Retry")]
       Retry = 2,
             
-      [ProtoEnum(Name=@"Skip", Value=3)]
+      [ProtoEnum(Name=@"Skip")]
       Skip = 3,
             
-      [ProtoEnum(Name=@"Stop", Value=4)]
+      [ProtoEnum(Name=@"Stop")]
       Stop = 4
     }
   
@@ -1302,19 +1302,19 @@ namespace EventStore.ClientAPI.Messages
     public enum SubscriptionDropReason
     {
             
-      [ProtoEnum(Name=@"Unsubscribed", Value=0)]
+      [ProtoEnum(Name=@"Unsubscribed")]
       Unsubscribed = 0,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=1)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 1,
             
-      [ProtoEnum(Name=@"NotFound", Value=2)]
+      [ProtoEnum(Name=@"NotFound")]
       NotFound = 2,
             
-      [ProtoEnum(Name=@"PersistentSubscriptionDeleted", Value=3)]
+      [ProtoEnum(Name=@"PersistentSubscriptionDeleted")]
       PersistentSubscriptionDeleted = 3,
             
-      [ProtoEnum(Name=@"SubscriberMaxCountReached", Value=4)]
+      [ProtoEnum(Name=@"SubscriberMaxCountReached")]
       SubscriberMaxCountReached = 4
     }
   
@@ -1373,16 +1373,16 @@ namespace EventStore.ClientAPI.Messages
     public enum NotHandledReason
     {
             
-      [ProtoEnum(Name=@"NotReady", Value=0)]
+      [ProtoEnum(Name=@"NotReady")]
       NotReady = 0,
             
-      [ProtoEnum(Name=@"TooBusy", Value=1)]
+      [ProtoEnum(Name=@"TooBusy")]
       TooBusy = 1,
             
-      [ProtoEnum(Name=@"NotLeader", Value=2)]
+      [ProtoEnum(Name=@"NotLeader")]
       NotLeader = 2,
             
-      [ProtoEnum(Name=@"IsReadOnly", Value=3)]
+      [ProtoEnum(Name=@"IsReadOnly")]
       IsReadOnly = 3
     }
   
@@ -1416,13 +1416,13 @@ namespace EventStore.ClientAPI.Messages
     public enum ScavengeResult
     {
             
-      [ProtoEnum(Name=@"Started", Value=0)]
+      [ProtoEnum(Name=@"Started")]
       Started = 0,
             
-      [ProtoEnum(Name=@"InProgress", Value=1)]
+      [ProtoEnum(Name=@"InProgress")]
       InProgress = 1,
             
-      [ProtoEnum(Name=@"Unauthorized", Value=2)]
+      [ProtoEnum(Name=@"Unauthorized")]
       Unauthorized = 2
     }
   
@@ -1465,28 +1465,28 @@ namespace EventStore.ClientAPI.Messages
     public enum OperationResult
     {
             
-      [ProtoEnum(Name=@"Success", Value=0)]
+      [ProtoEnum(Name=@"Success")]
       Success = 0,
             
-      [ProtoEnum(Name=@"PrepareTimeout", Value=1)]
+      [ProtoEnum(Name=@"PrepareTimeout")]
       PrepareTimeout = 1,
             
-      [ProtoEnum(Name=@"CommitTimeout", Value=2)]
+      [ProtoEnum(Name=@"CommitTimeout")]
       CommitTimeout = 2,
             
-      [ProtoEnum(Name=@"ForwardTimeout", Value=3)]
+      [ProtoEnum(Name=@"ForwardTimeout")]
       ForwardTimeout = 3,
             
-      [ProtoEnum(Name=@"WrongExpectedVersion", Value=4)]
+      [ProtoEnum(Name=@"WrongExpectedVersion")]
       WrongExpectedVersion = 4,
             
-      [ProtoEnum(Name=@"StreamDeleted", Value=5)]
+      [ProtoEnum(Name=@"StreamDeleted")]
       StreamDeleted = 5,
             
-      [ProtoEnum(Name=@"InvalidTransaction", Value=6)]
+      [ProtoEnum(Name=@"InvalidTransaction")]
       InvalidTransaction = 6,
             
-      [ProtoEnum(Name=@"AccessDenied", Value=7)]
+      [ProtoEnum(Name=@"AccessDenied")]
       AccessDenied = 7
     }
   
