@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest]
         test: [""]
         configuration: [release]
-        docker-tag: ['ci']
+        docker-tag: ['ci', '22.6.0-buster-slim']
     runs-on: ${{ matrix.os }}
     name: build-${{ matrix.os }}/${{ matrix.framework }}/EventStore.ClientAPI${{ matrix.test }}
     steps:
