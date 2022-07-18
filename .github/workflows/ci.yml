@@ -24,7 +24,7 @@ jobs:
         configuration: [release]
         docker-tag: ['ci', '22.6.0-buster-slim']
     runs-on: ${{ matrix.os }}
-    name: build-${{ matrix.os }}/${{ matrix.framework }}/EventStore.ClientAPI${{ matrix.test }}
+    name: build-${{ matrix.os }}/${{ matrix.framework }}/server-${{ matrix.docker-tag }}/EventStore.ClientAPI${{ matrix.test }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
