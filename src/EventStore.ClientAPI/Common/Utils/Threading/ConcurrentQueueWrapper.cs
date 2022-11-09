@@ -15,8 +15,7 @@ namespace EventStore.ClientAPI.Common.Utils.Threading {
 
 		public new int Count {
 			get {
-				int curCount = _queueCount;
-				return curCount < 0 ? 0 : curCount;
+				return _queueCount < 0 ? 0 : _queueCount;
 			}
 		}
 
