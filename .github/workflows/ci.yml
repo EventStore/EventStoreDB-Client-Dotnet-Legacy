@@ -62,20 +62,9 @@ jobs:
       run: |
         ./gencert.sh
         dotnet test --configuration ${{ matrix.configuration }} --blame \
-          --logger:html --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" \
-          --results-directory=$(pwd)/test-results/test/EventStore.ClientAPI${{ matrix.test }}.Tests \
+          --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" \
           --framework ${{ matrix.framework }} \
           test/EventStore.ClientAPI${{ matrix.test }}.Tests
-    - name: Collect Test Results
-      if: always()
-      run: |
-        echo $(find ./test-results -name "*.html" | xargs cat) > test-results.html
-    - name: Publish Test Results (HTML)
-      uses: actions/upload-artifact@v1
-      if: always()
-      with:
-        path: test-results.html
-        name: test-results-${{ matrix.configuration }}-${{ matrix.os }}-${{ matrix.framework }}-EventStore.ClientAPI${{ matrix.test }}.html
   publish:
     timeout-minutes: 5
     needs: [build-dotnet]
