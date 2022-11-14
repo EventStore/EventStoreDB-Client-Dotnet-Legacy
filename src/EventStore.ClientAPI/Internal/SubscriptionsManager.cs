@@ -89,8 +89,9 @@ namespace EventStore.ClientAPI.Internal {
 		}
 
 		public void CheckTimeoutsAndRetry(TcpPackageConnection connection) {
-			Ensure.NotNull(connection, "connection");
-
+			if (connection is null) {
+				return;
+			}
 			var retrySubscriptions = new List<SubscriptionItem>();
 			var removeSubscriptions = new List<SubscriptionItem>();
 			foreach (var subscription in _activeSubscriptions.Values) {

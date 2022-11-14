@@ -168,20 +168,30 @@ namespace EventStore.ClientAPI.Internal {
 				? endPoints.SecureTcpEndPoint != null
 				: _settings.UseSslConnection;
 
-			_connectingPhase = ConnectingPhase.ConnectionEstablishing;
-			_connection = new TcpPackageConnection(
-				_settings.Log,
-				endPoint,
-				Guid.NewGuid(),
-				useSsl,
-				_settings.ValidateServer,
-				_settings.ClientConnectionTimeout,
-				(connection, package) => EnqueueMessage(new HandleTcpPackageMessage(connection, package)),
-				(connection, exc) => EnqueueMessage(new TcpConnectionErrorMessage(connection, exc)),
-				connection => EnqueueMessage(new TcpConnectionEstablishedMessage(connection)),
-				(connection, error) => EnqueueMessage(new TcpConnectionClosedMessage(connection, error)));
+			try {
+				_connectingPhase = ConnectingPhase.ConnectionEstablishing;
+				_connection = new TcpPackageConnection(
+					_settings.Log,
+					endPoint,
+					Guid.NewGuid(),
+					useSsl,
+					_settings.ValidateServer,
+					_settings.ClientConnectionTimeout,
+					(connection, package) => EnqueueMessage(new HandleTcpPackageMessage(connection, package)),
+					(connection, exc) => EnqueueMessage(new TcpConnectionErrorMessage(connection, exc)),
+					connection => EnqueueMessage(new TcpConnectionEstablishedMessage(connection)),
+					(connection, error) => EnqueueMessage(new TcpConnectionClosedMessage(connection, error)));
 
-			_connection.StartReceiving();
+				_connection.StartReceiving();
+			} catch (Exception ex) {
+				LogDebug("Failed to establish connection to {0}, exc {1}", endPoint, ex);
+
+				_state = ConnectionState.Connecting;
+				_connectingPhase = ConnectingPhase.Reconnecting;
+
+				_reconnInfo = new ReconnectionInfo(_reconnInfo.ReconnectionAttempt, _stopwatch.Elapsed);
+				RaiseErrorOccurred(ex);
+			}
 		}
 
 		private void TcpConnectionError(TcpPackageConnection connection, Exception exception) {
