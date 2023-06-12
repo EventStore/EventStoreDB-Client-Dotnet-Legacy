@@ -22,9 +22,9 @@ jobs:
         os: [ubuntu-latest]
         test: [""]
         configuration: [release]
-        docker-tag: ['ci']
+        docker-tag: ['ci', 'lts', 'previous-lts']
     runs-on: ${{ matrix.os }}
-    name: build-${{ matrix.os }}/${{ matrix.framework }}/EventStore.ClientAPI${{ matrix.test }}
+    name: build-${{ matrix.os }}/${{ matrix.framework }}/${{ matrix.docker-tag }}/EventStore.ClientAPI${{ matrix.test }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
