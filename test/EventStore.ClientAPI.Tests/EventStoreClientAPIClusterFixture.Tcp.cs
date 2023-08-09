@@ -66,7 +66,9 @@ namespace EventStore.ClientAPI {
 			settings += "CustomHttpMessageHandler=SkipCertificateValidation;";
 
 			var connectionString = $"GossipSeeds={gossipSeedsString};{settings}";
-			return EventStoreConnection.Create(connectionString);
+			var builder = ConnectionSettings.Create()
+				.SetDefaultUserCredentials(new UserCredentials("admin", "changeit"));
+			return EventStoreConnection.Create(connectionString, builder);
 		}
 	}
 }
