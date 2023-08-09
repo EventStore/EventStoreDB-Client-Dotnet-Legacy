@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using EventStore.ClientAPI.SystemData;
 
 namespace EventStore.ClientAPI {
 	partial class EventStoreClientAPISingleNodeFixture {
@@ -8,7 +9,7 @@ namespace EventStore.ClientAPI {
 		public IEventStoreConnection CreateConnection(
 			Func<ConnectionSettingsBuilder, ConnectionSettingsBuilder> configureSettings = default,
 			int? port = default, bool useDnsEndPoint = true) {
-			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder).Build();
+			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder).SetDefaultUserCredentials(new UserCredentials("admin", "changeit")).Build();
 			return EventStoreConnection.Create(
 				settings,
 				useDnsEndPoint

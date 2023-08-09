@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using EventStore.ClientAPI.Internal;
+using EventStore.ClientAPI.SystemData;
 
 namespace EventStore.ClientAPI {
 	partial class EventStoreClientAPIClusterFixture {
@@ -27,7 +28,7 @@ namespace EventStore.ClientAPI {
 			bool useDnsEndPoint = false,
 			int maxDiscoverAttempts = 1) {
 
-			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder)
+			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder).SetDefaultUserCredentials(new UserCredentials("admin", "changeit"))
 			.Build();
 			var gossipSeeds = GetGossipSeedEndPointsExceptFor(-1, port, useDnsEndPoint);
 			var clusterSettings = new ClusterSettingsBuilder()
