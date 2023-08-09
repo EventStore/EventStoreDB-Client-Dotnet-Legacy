@@ -25,7 +25,7 @@ namespace EventStore.ClientAPI {
 
 			settings += "UseSslConnection=true;ValidateServer=false;";
 
-			return EventStoreConnection.Create($"ConnectTo=tcp://{host}:{port};{settings}");
+			return EventStoreConnection.Create($"ConnectTo=tcp://admin:changeit@{host}:{port};{settings}");
 		}
 	}
 }
