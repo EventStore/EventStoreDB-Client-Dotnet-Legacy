@@ -25,6 +25,11 @@ namespace EventStore.ClientAPI {
 				? _cluster.Connection
 				: _singleNode.Connection;
 
+		public IEventStoreConnection AnonymousConnection =>
+			UseCluster
+				? _cluster.AnonymousConnection
+				: _singleNode.AnonymousConnection;
+
 		public IService EventStore =>
 			UseCluster
 				? _cluster.EventStore
@@ -48,18 +53,21 @@ namespace EventStore.ClientAPI {
 		public IEventStoreConnection CreateConnection(
 			Func<ConnectionSettingsBuilder, ConnectionSettingsBuilder> configureSettings,
 			bool useStandardPort,
-			int clusterMaxDiscoverAttempts = 1) =>
+			int clusterMaxDiscoverAttempts = 1,
+			bool authenticated = true) =>
 
 			UseCluster
 				? _cluster.CreateConnectionWithGossipSeeds(
 					configureSettings,
 					useStandardPort ? 2113 : 2118,
 					useDnsEndPoint: true,
-					maxDiscoverAttempts: clusterMaxDiscoverAttempts)
+					maxDiscoverAttempts: clusterMaxDiscoverAttempts,
+					authenticated: authenticated)
 				: _singleNode.CreateConnection(
 					configureSettings,
 					useStandardPort ? 1113 : 1114,
-					useDnsEndPoint: true);
+					useDnsEndPoint: true,
+					authenticated: authenticated);
 
 		public IEventStoreConnection CreateConnectionWithConnectionString(
 			string configureSettings,

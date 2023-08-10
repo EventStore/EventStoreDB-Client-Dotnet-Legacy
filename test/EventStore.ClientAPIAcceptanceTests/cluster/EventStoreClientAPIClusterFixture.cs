@@ -13,11 +13,13 @@ namespace EventStore.ClientAPI {
 		private readonly ICompositeService _eventStoreCluster;
 
 		public IEventStoreConnection Connection { get; }
+		public IEventStoreConnection AnonymousConnection { get; }
 		public ICompositeService EventStore => _eventStoreCluster;
 
 		public EventStoreClientAPIClusterFixture() {
 			_eventStoreCluster = BuildCluster();
 			Connection = CreateConnectionWithConnectionString(useSsl: true);
+			AnonymousConnection = CreateConnectionWithConnectionString(useSsl: true, authenticated: false);
 		}
 
 		private ICompositeService BuildCluster() {
@@ -66,10 +68,12 @@ namespace EventStore.ClientAPI {
 				throw;
 			}
 			await Connection.ConnectAsync();
+			await AnonymousConnection.ConnectAsync();
 		}
 
 		public Task DisposeAsync() {
 			Connection.Dispose();
+			AnonymousConnection.Dispose();
 			_eventStoreCluster.Stop();
 			_eventStoreCluster.Dispose();
 			return Task.CompletedTask;

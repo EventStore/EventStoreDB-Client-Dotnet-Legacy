@@ -41,7 +41,7 @@ namespace EventStore.ClientAPI {
 
 		[Fact]
 		public async Task without_permission_throws() {
-			var connection = _fixture.Connection;
+			var connection = _fixture.AnonymousConnection;
 			await Assert.ThrowsAsync<AccessDeniedException>(() => connection.SetSystemSettingsAsync(new SystemSettings(
 				new StreamAcl(
 					Guid.NewGuid().ToString(),

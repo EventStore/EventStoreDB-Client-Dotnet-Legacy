@@ -16,7 +16,7 @@ namespace EventStore.ClientAPI {
 		[Fact]
 		public async Task that_does_not_exist_throws() {
 			var streamName = GetStreamName();
-			var connection = _fixture.Connection;
+			var connection = _fixture.AnonymousConnection;
 
 			var ex = await Record.ExceptionAsync(() => connection.ConnectToPersistentSubscriptionAsync(
 				streamName, Group,

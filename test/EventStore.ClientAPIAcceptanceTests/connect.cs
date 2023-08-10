@@ -150,7 +150,8 @@ namespace EventStore.ClientAPI {
 					.SetReconnectionDelayTo(TimeSpan.FromMilliseconds(20))
 					.KeepReconnecting()
 					.KeepRetrying()
-					.FailOnNoServerResponse(),
+					.FailOnNoServerResponse()
+					.SetDefaultUserCredentials(DefaultUserCredentials.Admin),
 				useStandardPort: true,
 				clusterMaxDiscoverAttempts: -1);
 
@@ -178,7 +179,7 @@ namespace EventStore.ClientAPI {
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 
 			Task<WriteResult> WriteAnEventAsync() => connection
-				.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
+				.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents(), DefaultUserCredentials.Admin);
 		}
 
 		[Fact]

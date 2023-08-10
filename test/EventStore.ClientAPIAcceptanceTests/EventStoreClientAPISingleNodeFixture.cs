@@ -18,6 +18,7 @@ namespace EventStore.ClientAPI {
 		private readonly IContainerService _eventStore;
 
 		public IEventStoreConnection Connection { get; }
+		public IEventStoreConnection AnonymousConnection { get; }
 		public IContainerService EventStore => _eventStore;
 
 		public EventStoreClientAPISingleNodeFixture() {
@@ -42,6 +43,7 @@ namespace EventStore.ClientAPI {
 				.MountVolume(HostCertificatePath, "/etc/eventstore/certs", MountType.ReadOnly)
 				.Build();
 			Connection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113);
+			AnonymousConnection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113, authenticated: false);
 		}
 
 		public async Task InitializeAsync() {
@@ -70,10 +72,12 @@ namespace EventStore.ClientAPI {
 				throw;
 			}
 			await Connection.ConnectAsync();
+			await AnonymousConnection.ConnectAsync();
 		}
 
 		public Task DisposeAsync() {
 			Connection.Dispose();
+			AnonymousConnection.Dispose();
 			_eventStore.Dispose();
 			return Task.CompletedTask;
 		}
