@@ -14,7 +14,7 @@ namespace EventStore.ClientAPI {
 		[Fact]
 		public async Task without_credentials_throws() {
 			var streamName = GetStreamName();
-			var connection = _fixture.Connection;
+			var connection = _fixture.AnonymousConnection;
 
 			await Assert.ThrowsAsync<AccessDeniedException>(() => connection.CreatePersistentSubscriptionAsync(
 				streamName, Group,
