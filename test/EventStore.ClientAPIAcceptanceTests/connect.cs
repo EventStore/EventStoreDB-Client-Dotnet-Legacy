@@ -132,7 +132,7 @@ namespace EventStore.ClientAPI {
 			await connection.ConnectAsync().WithTimeout();
 			for (var i = 0; i < 10; i++) {
 				try {
-					await connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
+					await connection.ReadStreamEventsForwardAsync("$users", 0, 100, false, DefaultUserCredentials.Admin);
 					break;
 				} catch (NotAuthenticatedException) {
 					// ignore
