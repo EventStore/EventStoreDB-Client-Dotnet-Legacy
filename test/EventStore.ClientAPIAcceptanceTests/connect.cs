@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using EventStore.ClientAPI.Exceptions;
 using Polly;
 using Xunit;
 
@@ -129,6 +130,15 @@ namespace EventStore.ClientAPI {
 				useStandardPort: true,
 				useDnsEndPoint: false);
 			await connection.ConnectAsync().WithTimeout();
+			await connection.ConnectAsync().WithTimeout();
+			for (var i = 0; i < 10; i++) {
+				try {
+					await connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
+					break;
+				} catch (NotAuthenticatedException) {
+					// ignore
+				}
+			}
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
@@ -158,6 +168,14 @@ namespace EventStore.ClientAPI {
 			connection.Disconnected += (_, _) => disconnectedSource.TrySetResult(true);
 
 			await connection.ConnectAsync().WithTimeout();
+			for (var i = 0; i < 10; i++) {
+				try {
+					await connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
+					break;
+				} catch (NotAuthenticatedException) {
+					// ignore
+				}
+			}
 
 			// can definitely write without throwing
 			await WriteAnEventAsync().WithTimeout();

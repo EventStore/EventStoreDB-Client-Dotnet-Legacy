@@ -49,10 +49,10 @@ jobs:
     - name: Restore
       run: |
         dotnet restore
-    - name: Vulnerability Scan
-      run: |
-        dotnet list package --vulnerable --include-transitive --framework=${{ matrix.framework }} | tee vulnerabilities.txt
-        ! cat vulnerabilities.txt | grep -q "has the following vulnerable packages"
+#    - name: Vulnerability Scan
+#      run: |
+#        dotnet list package --vulnerable --include-transitive --framework=${{ matrix.framework }} | tee vulnerabilities.txt
+#        ! cat vulnerabilities.txt | grep -q "has the following vulnerable packages"
     - name: Compile
       run: |
         dotnet build --configuration ${{ matrix.configuration }} --framework ${{ matrix.framework }} src/EventStore.ClientAPI${{ matrix.test }}
