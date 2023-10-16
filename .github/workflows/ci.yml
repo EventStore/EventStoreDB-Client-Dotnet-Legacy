@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest]
         test: [""]
         configuration: [release]
-        docker-tag: ['23.6.0-focal']
+        docker-tag: ['23.10.0-focal']
     runs-on: ${{ matrix.os }}
     name: build-${{ matrix.os }}/${{ matrix.framework }}/${{ matrix.docker-tag }}/EventStore.ClientAPI${{ matrix.test }}
     steps:
