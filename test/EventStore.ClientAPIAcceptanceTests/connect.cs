@@ -169,7 +169,7 @@ namespace EventStore.ClientAPI {
 			await connection.ConnectAsync().WithTimeout();
 			for (var i = 0; i < 10; i++) {
 				try {
-					await connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
+					await connection.ReadStreamEventsForwardAsync("$users", 0, 100, false, DefaultUserCredentials.Admin);
 					break;
 				} catch (NotAuthenticatedException) {
 					// ignore
@@ -192,12 +192,14 @@ namespace EventStore.ClientAPI {
 
 			for (var i = 0; i < 10; i++) {
 				try {
-					await connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
+					await connection.ReadStreamEventsForwardAsync("$users", 0, 100, false, DefaultUserCredentials.Admin);
 					break;
 				} catch (NotAuthenticatedException) {
 					// ignore
 				}
 			}
+
+			writeTask = WriteAnEventAsync();
 			// same writeTask can complete now by reconnecting and retrying
 			var writeResult = await writeTask.WithTimeout(TimeSpan.FromMilliseconds(120 * 1000));
 
