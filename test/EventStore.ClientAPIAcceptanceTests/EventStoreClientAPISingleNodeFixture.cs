@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Ductus.FluentDocker.Builders;
 using Ductus.FluentDocker.Model.Builders;
 using Ductus.FluentDocker.Services;
+using EventStore.ClientAPI.Exceptions;
+using EventStore.ClientAPI.SystemData;
 using Polly;
 using Xunit;
 
@@ -72,6 +74,16 @@ namespace EventStore.ClientAPI {
 				throw;
 			}
 			await Connection.ConnectAsync();
+
+			for (var i = 0; i < 10; i++) {
+				try {
+					await Connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
+					break;
+				} catch (NotAuthenticatedException) {
+					// ignore
+				}
+			}
+
 			await AnonymousConnection.ConnectAsync();
 		}
 
