@@ -130,7 +130,6 @@ namespace EventStore.ClientAPI {
 				useStandardPort: true,
 				useDnsEndPoint: false);
 			await connection.ConnectAsync().WithTimeout();
-			await connection.ConnectAsync().WithTimeout();
 			for (var i = 0; i < 10; i++) {
 				try {
 					await connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
@@ -191,6 +190,14 @@ namespace EventStore.ClientAPI {
 
 			_fixture.EventStore.Start();
 
+			for (var i = 0; i < 10; i++) {
+				try {
+					await connection.ReadEventAsync("$users", 0, false, DefaultUserCredentials.Admin);
+					break;
+				} catch (NotAuthenticatedException) {
+					// ignore
+				}
+			}
 			// same writeTask can complete now by reconnecting and retrying
 			var writeResult = await writeTask.WithTimeout(TimeSpan.FromMilliseconds(120 * 1000));
 
