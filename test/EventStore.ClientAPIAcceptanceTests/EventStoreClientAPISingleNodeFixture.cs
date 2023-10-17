@@ -44,7 +44,7 @@ namespace EventStore.ClientAPI {
 				.ExposePort(2113, 2113)
 				.MountVolume(HostCertificatePath, "/etc/eventstore/certs", MountType.ReadOnly)
 				.Build();
-			Connection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113);
+			Connection = CreateConnection(settings => settings.UseSsl(true).SetDefaultUserCredentials(DefaultUserCredentials.Admin).DisableServerCertificateValidation(), 1113);
 			AnonymousConnection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113, authenticated: false);
 		}
 

@@ -199,7 +199,6 @@ namespace EventStore.ClientAPI {
 				}
 			}
 
-			writeTask = WriteAnEventAsync();
 			// same writeTask can complete now by reconnecting and retrying
 			var writeResult = await writeTask.WithTimeout(TimeSpan.FromMilliseconds(120 * 1000));
 
