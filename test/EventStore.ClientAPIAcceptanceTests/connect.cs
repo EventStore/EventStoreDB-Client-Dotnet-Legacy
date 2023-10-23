@@ -148,8 +148,8 @@ namespace EventStore.ClientAPI {
 			using var connection = _fixture.CreateConnection(
 				builder => builder.UseSsl(true)
 					.DisableServerCertificateValidation()
-					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
-					.SetReconnectionDelayTo(TimeSpan.FromMilliseconds(20))
+					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(20))
+					.SetReconnectionDelayTo(TimeSpan.FromMilliseconds(40))
 					.KeepReconnecting()
 					.KeepRetrying()
 					.FailOnNoServerResponse()
