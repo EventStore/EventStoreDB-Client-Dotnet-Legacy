@@ -130,14 +130,7 @@ namespace EventStore.ClientAPI {
 				useStandardPort: true,
 				useDnsEndPoint: false);
 			await connection.ConnectAsync().WithTimeout();
-			for (var i = 0; i < 10; i++) {
-				try {
-					await connection.ReadStreamEventsForwardAsync("$users", 0, 100, false, DefaultUserCredentials.Admin);
-					break;
-				} catch (NotAuthenticatedException) {
-					// ignore
-				}
-			}
+			await connection.WaitForUsers();
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
@@ -167,14 +160,7 @@ namespace EventStore.ClientAPI {
 			connection.Disconnected += (_, _) => disconnectedSource.TrySetResult(true);
 
 			await connection.ConnectAsync().WithTimeout();
-			for (var i = 0; i < 10; i++) {
-				try {
-					await connection.ReadStreamEventsForwardAsync("$users", 0, 100, false, DefaultUserCredentials.Admin);
-					break;
-				} catch (NotAuthenticatedException) {
-					// ignore
-				}
-			}
+			await connection.WaitForUsers();
 
 			// can definitely write without throwing
 			await WriteAnEventAsync().WithTimeout();
@@ -190,14 +176,7 @@ namespace EventStore.ClientAPI {
 
 			_fixture.EventStore.Start();
 
-			for (var i = 0; i < 10; i++) {
-				try {
-					await connection.ReadStreamEventsForwardAsync("$users", 0, 100, false, DefaultUserCredentials.Admin);
-					break;
-				} catch (NotAuthenticatedException) {
-					// ignore
-				}
-			}
+			await connection.WaitForUsers();
 
 			// same writeTask can complete now by reconnecting and retrying
 			var writeResult = await writeTask.WithTimeout(TimeSpan.FromMilliseconds(120 * 1000));

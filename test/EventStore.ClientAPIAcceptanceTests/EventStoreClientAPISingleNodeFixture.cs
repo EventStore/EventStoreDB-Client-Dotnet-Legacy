@@ -74,16 +74,7 @@ namespace EventStore.ClientAPI {
 				throw;
 			}
 			await Connection.ConnectAsync();
-
-			for (var i = 0; i < 10; i++) {
-				try {
-					await Connection.ReadStreamEventsForwardAsync("$users", 0, 100, false, DefaultUserCredentials.Admin);
-					break;
-				} catch (NotAuthenticatedException) {
-					// ignore
-				}
-			}
-
+			await Connection.WaitForUsers();
 			await AnonymousConnection.ConnectAsync();
 		}
 

@@ -68,6 +68,7 @@ namespace EventStore.ClientAPI {
 				throw;
 			}
 			await Connection.ConnectAsync();
+			await Connection.WaitForUsers();
 			await AnonymousConnection.ConnectAsync();
 		}
 
