@@ -15,7 +15,7 @@ namespace EventStore.ClientAPI {
 		[Fact]
 		public async Task without_credentials_fails() {
 			var streamName = GetStreamName();
-			var connection = _fixture.Connection;
+			var connection = _fixture.AnonymousConnection;
 
 			await connection.CreatePersistentSubscriptionAsync(streamName, Group,
 				PersistentSubscriptionSettings.Create(), DefaultUserCredentials.Admin).WithTimeout();

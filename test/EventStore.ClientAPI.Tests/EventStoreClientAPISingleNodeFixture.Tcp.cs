@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using EventStore.ClientAPI.SystemData;
 
 namespace EventStore.ClientAPI {
 	partial class EventStoreClientAPISingleNodeFixture {
@@ -7,8 +8,10 @@ namespace EventStore.ClientAPI {
 
 		public IEventStoreConnection CreateConnection(
 			Func<ConnectionSettingsBuilder, ConnectionSettingsBuilder> configureSettings = default,
-			int? port = default, bool useDnsEndPoint = true) {
-			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder).Build();
+			int? port = default, bool useDnsEndPoint = true, bool authenticated = true) {
+
+			UserCredentials user = authenticated ? DefaultUserCredentials.Admin : null;
+			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder).SetDefaultUserCredentials(user).Build();
 			return EventStoreConnection.Create(
 				settings,
 				useDnsEndPoint
@@ -17,14 +20,16 @@ namespace EventStore.ClientAPI {
 		}
 
 		public IEventStoreConnection CreateConnectionWithConnectionString(string configureSettings = default,
-			int? port = default, bool useDnsEndPoint = false) {
+			int? port = default, bool useDnsEndPoint = false, bool authenticated = true) {
 			var settings = configureSettings ?? DefaultConfigureSettingsForConnectionString;
 			var host = useDnsEndPoint ? "localhost" : IPAddress.Loopback.ToString();
 			port ??= 1113;
 
 			settings += "UseSslConnection=true;ValidateServer=false;";
 
-			return EventStoreConnection.Create($"ConnectTo=tcp://{host}:{port};{settings}");
+			var auth = authenticated ? "admin:changeit@" : "";
+
+			return EventStoreConnection.Create($"ConnectTo=tcp://{auth}{host}:{port};{settings}");
 		}
 	}
 }

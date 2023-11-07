@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using EventStore.ClientAPI.Exceptions;
 using Polly;
 using Xunit;
 
@@ -129,6 +130,7 @@ namespace EventStore.ClientAPI {
 				useStandardPort: true,
 				useDnsEndPoint: false);
 			await connection.ConnectAsync().WithTimeout();
+			await connection.WaitForUsers();
 			var writeResult =
 				await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
@@ -146,17 +148,19 @@ namespace EventStore.ClientAPI {
 			using var connection = _fixture.CreateConnection(
 				builder => builder.UseSsl(true)
 					.DisableServerCertificateValidation()
-					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(10))
-					.SetReconnectionDelayTo(TimeSpan.FromMilliseconds(20))
+					.WithConnectionTimeoutOf(TimeSpan.FromSeconds(20))
+					.SetReconnectionDelayTo(TimeSpan.FromMilliseconds(40))
 					.KeepReconnecting()
 					.KeepRetrying()
-					.FailOnNoServerResponse(),
+					.FailOnNoServerResponse()
+					.SetDefaultUserCredentials(DefaultUserCredentials.Admin),
 				useStandardPort: true,
 				clusterMaxDiscoverAttempts: -1);
 
 			connection.Disconnected += (_, _) => disconnectedSource.TrySetResult(true);
 
 			await connection.ConnectAsync().WithTimeout();
+			await connection.WaitForUsers();
 
 			// can definitely write without throwing
 			await WriteAnEventAsync().WithTimeout();
@@ -172,13 +176,15 @@ namespace EventStore.ClientAPI {
 
 			_fixture.EventStore.Start();
 
+			await connection.WaitForUsers();
+
 			// same writeTask can complete now by reconnecting and retrying
-			var writeResult = await writeTask.WithTimeout(TimeSpan.FromMilliseconds(100 * 1000));
+			var writeResult = await writeTask.WithTimeout(TimeSpan.FromMilliseconds(120 * 1000));
 
 			Assert.True(writeResult.LogPosition.PreparePosition > 0);
 
 			Task<WriteResult> WriteAnEventAsync() => connection
-				.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents());
+				.AppendToStreamAsync(streamName, ExpectedVersion.Any, _fixture.CreateTestEvents(), DefaultUserCredentials.Admin);
 		}
 
 		[Fact]

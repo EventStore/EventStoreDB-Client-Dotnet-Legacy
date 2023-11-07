@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using EventStore.ClientAPI.Internal;
+using EventStore.ClientAPI.SystemData;
 
 namespace EventStore.ClientAPI {
 	partial class EventStoreClientAPIClusterFixture {
@@ -25,9 +26,11 @@ namespace EventStore.ClientAPI {
 			Func<ConnectionSettingsBuilder, ConnectionSettingsBuilder> configureSettings = default,
 			int port = 2113,
 			bool useDnsEndPoint = false,
-			int maxDiscoverAttempts = 1) {
+			int maxDiscoverAttempts = 1,
+			bool authenticated = true) {
 
-			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder)
+			var user = authenticated ? DefaultUserCredentials.Admin : null;
+			var settings = (configureSettings ?? DefaultConfigureSettings)(DefaultBuilder).SetDefaultUserCredentials(user)
 			.Build();
 			var gossipSeeds = GetGossipSeedEndPointsExceptFor(-1, port, useDnsEndPoint);
 			var clusterSettings = new ClusterSettingsBuilder()
@@ -47,7 +50,8 @@ namespace EventStore.ClientAPI {
 			bool useSsl,
 			string configureSettings = default,
 			int port = 2113,
-			bool useDnsEndPoint = false) {
+			bool useDnsEndPoint = false,
+			bool authenticated = true) {
 
 			var settings = configureSettings ?? DefaultConfigureSettingsForConnectionString;
 			var host = useDnsEndPoint ? "localhost" : IPAddress.Loopback.ToString();
@@ -65,7 +69,10 @@ namespace EventStore.ClientAPI {
 			settings += "CustomHttpMessageHandler=SkipCertificateValidation;";
 
 			var connectionString = $"GossipSeeds={gossipSeedsString};{settings}";
-			return EventStoreConnection.Create(connectionString);
+			var user = authenticated ? DefaultUserCredentials.Admin : null;
+			var builder = ConnectionSettings.Create()
+				.SetDefaultUserCredentials(user);
+			return EventStoreConnection.Create(connectionString, builder);
 		}
 	}
 }

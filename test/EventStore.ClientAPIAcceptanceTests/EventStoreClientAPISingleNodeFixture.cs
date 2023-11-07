@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Ductus.FluentDocker.Builders;
 using Ductus.FluentDocker.Model.Builders;
 using Ductus.FluentDocker.Services;
+using EventStore.ClientAPI.Exceptions;
+using EventStore.ClientAPI.SystemData;
 using Polly;
 using Xunit;
 
@@ -18,6 +20,7 @@ namespace EventStore.ClientAPI {
 		private readonly IContainerService _eventStore;
 
 		public IEventStoreConnection Connection { get; }
+		public IEventStoreConnection AnonymousConnection { get; }
 		public IContainerService EventStore => _eventStore;
 
 		public EventStoreClientAPISingleNodeFixture() {
@@ -41,7 +44,8 @@ namespace EventStore.ClientAPI {
 				.ExposePort(2113, 2113)
 				.MountVolume(HostCertificatePath, "/etc/eventstore/certs", MountType.ReadOnly)
 				.Build();
-			Connection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113);
+			Connection = CreateConnection(settings => settings.UseSsl(true).SetDefaultUserCredentials(DefaultUserCredentials.Admin).DisableServerCertificateValidation(), 1113);
+			AnonymousConnection = CreateConnection(settings => settings.UseSsl(true).DisableServerCertificateValidation(), 1113, authenticated: false);
 		}
 
 		public async Task InitializeAsync() {
@@ -70,10 +74,13 @@ namespace EventStore.ClientAPI {
 				throw;
 			}
 			await Connection.ConnectAsync();
+			await Connection.WaitForUsers();
+			await AnonymousConnection.ConnectAsync();
 		}
 
 		public Task DisposeAsync() {
 			Connection.Dispose();
+			AnonymousConnection.Dispose();
 			_eventStore.Dispose();
 			return Task.CompletedTask;
 		}
