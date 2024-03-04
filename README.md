@@ -2,8 +2,9 @@
 
 EventStoreDB is the open-source, functional database with Complex Event Processing in JavaScript.
 
-This is the repository for the legacy .NET TCP client for EventStoreDB version 5+ and uses TCP as the communication protocol.  
-If you're looking for the new recommended .NET gRPC client, check the [EventStore-Client-Dotnet](https://github.com/EventStore/EventStore-Client-Dotnet) repo.
+This is the repository for the legacy .NET TCP client for EventStoreDB version 5 - 23.10 and uses TCP as the communication protocol. ESDB versions later than 23.10 do not support TCP.
+
+If you're looking for the recommended .NET gRPC client, check the [EventStore-Client-Dotnet](https://github.com/EventStore/EventStore-Client-Dotnet) repo.
 
 ## Support
 
@@ -28,11 +29,11 @@ Then create the certificates for the tests in the `certs` directory:
 
 ## Documentation
 
-Documentation for EventStoreDB can be found here: [Event Store Docs](https://eventstore.com/docs/).
+Documentation for EventStoreDB can be found here: [Event Store Docs](https://developers.eventstore.com/).
 
 ## Community
 
-We have a community discussion space at [Event Store Discuss](https://discuss.eventstore.com/). If you prefer slack, there is also an #eventstore channel in the [DDD-CQRS-ES](https://j.mp/ddd-es-cqrs) slack community.
+Interact with the Event Store and event sourcing Communities on the Event Store [Discuss](https://discuss.eventstore.com/) or [Discord](https://discord.gg/Phn9pmCw3t) forum.
 
 ## Contributing
 
