@@ -4,7 +4,7 @@ EventStoreDB is the open-source, functional database with Complex Event Processi
 
 This is the repository for the legacy .NET TCP client for EventStoreDB version 5 - 23.10 and uses TCP as the communication protocol. ESDB versions later than 23.10 do not support TCP.
 
-If you're looking for the recommended .NET gRPC client, check the [EventStore-Client-Dotnet](https://github.com/EventStore/EventStore-Client-Dotnet) repo.
+For the preferred .NET gRPC client, visit the [EventStore-Client-Dotnet](https://github.com/EventStore/EventStore-Client-Dotnet) repository.
 
 ## Support
 
@@ -38,4 +38,4 @@ Interact with the Event Store and event sourcing Communities on the Event Store 
 ## Contributing
 
 Development is done on the `master` branch.  
-We attempt to do our best to ensure that the history remains clean and to do so, we generally ask contributors to squash their commits into a set or single logical commit.
+To maintain a clean history, we ask contributors to squash their commits into one or a few cohesive commits.
