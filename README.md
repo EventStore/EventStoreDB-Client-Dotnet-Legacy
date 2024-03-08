@@ -33,7 +33,7 @@ Documentation for EventStoreDB can be found here: [Event Store Docs](https://dev
 
 ## Community
 
-Interact with the Event Store and event sourcing Communities on the Event Store [Discuss](https://discuss.eventstore.com/) or [Discord](https://discord.gg/Phn9pmCw3t) forum.
+Interact with the Event Store and event sourcing communities on the Event Store [Discuss](https://discuss.eventstore.com/) or [Discord](https://discord.gg/Phn9pmCw3t) forum.
 
 ## Contributing
 
