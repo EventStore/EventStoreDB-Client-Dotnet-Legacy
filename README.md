@@ -1,3 +1,9 @@
+> [!WARNING]
+> **DEPRECATION NOTICE**: 
+> * EventStoreDB version 23.10.x is the last OSS version to support the tcp protocol based client.
+> 
+> We recommend moving to [EventStore-Client-Dotnet](https://github.com/EventStore/EventStore-Client-Dotnet) for ongoing updates and support.
+
 # EventStoreDB .NET TCP Client
 
 EventStoreDB is the open-source, functional database with Complex Event Processing in JavaScript.
